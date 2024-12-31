@@ -1,0 +1,469 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>String Constants And More | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Home Stretch This is going to be a longer post. In it, we’ll wrap up our two-pass assembler, add a PRTS opcode for printing, and tie up some other loose ends. At the end, we should have an interpre">
+<meta property="og:type" content="article">
+<meta property="og:title" content="String Constants And More">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/16/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="Home Stretch This is going to be a longer post. In it, we’ll wrap up our two-pass assembler, add a PRTS opcode for printing, and tie up some other loose ends. At the end, we should have an interpre">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2024-12-27T02:06:35.000Z">
+<meta property="article:modified_time" content="2024-12-30T09:12:18.359Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/16/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'String Constants And More',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-12-30 17:12:18'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">String Constants And More</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-27T02:06:35.000Z" title="发表于 2024-12-27 10:06:35">2024-12-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-30T09:12:18.359Z" title="更新于 2024-12-30 17:12:18">2024-12-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="String Constants And More"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="home-stretch">Home Stretch</h2>
+<p>This is going to be a longer post. In it, we’ll wrap up our two-pass
+assembler, add a <code>PRTS</code> opcode for printing, and tie up some
+other loose ends. At the end, we should have an interpreter with a good
+amount of functionality and a simple assembly language. We are, of
+course, far from done with the project. I want to work on a different
+tutorial series for a bit, then we’ll continue with Iridium. === Quick
+Change Add the following dependencies in your <code>Cargo.toml</code>.
+We’ll need them later:</p>
+<figure class="highlight toml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">log</span> = <span class="string">&quot;0.4&quot;</span></span><br><span class="line"><span class="attr">env_logger</span> = <span class="string">&quot;0.5.13&quot;</span></span><br><span class="line"><span class="attr">byteorder</span> = <span class="string">&quot;1&quot;</span></span><br></pre></td></tr></table></figure>
+<p>Without further ado…​</p>
+<h2 id="string-constants">String Constants</h2>
+<p>These are strings that you define in code. For example, if your
+program needed to print "Hello" a lot, you don’t want to a copy of
+"Hello" for each usage. Instead, we can use something quite similar to
+variables. To understand this, we need to talk about a special section
+of the bytecode.</p>
+<h3 id="read-only-section">Read-Only Section</h3>
+<p>When our assembler writes out its final blob of bytecode that our VM
+executes, it has a specific structure that is:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;header&gt;</span><br><span class="line">&lt;read-only data&gt;</span><br><span class="line">&lt;executable data&gt;</span><br></pre></td></tr></table></figure>
+<p>The read-only data is a special section of the bytecode where we
+store constants. A common example is strings. Let’s say we declare a
+string constant like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hello: .asciiz &#x27;Hello&#x27;</span><br></pre></td></tr></table></figure>
+<ol type="1">
+<li><code>hello</code>: is a label</li>
+<li><code>.asciiz</code> declares the type of the constant</li>
+<li><code>'Hello'</code> is the constant itself.</li>
+</ol>
+<p>When our assembler sees a line like this, it reads the bytes that
+make up <code>Hello</code> into the read-only section of memory and adds
+a <code>0</code>. Since the RO section is just another
+<code>Vec&lt;u8&gt;</code>, it would look like:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[72, 101, 108, 108, 111, 0]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>The above numbers are in base 10. 72 == H, 101 == e, 108 = l, 111 = o
+in UTF-8.</p>
+</blockquote>
+<p>Now let’s say we want another string constant, like <code>cat</code>,
+which is <code>[99, 97, 116]</code>. If we write this assembly:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hello: .asciiz &#x27;Hello&#x27;</span><br><span class="line">cat: .asciiz &#x27;cat&#x27;</span><br></pre></td></tr></table></figure>
+<p>Then our read-only section would look like:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[72, 101, 108, 108, 111, 0, 99, 97, 116, 0]</span><br></pre></td></tr></table></figure>
+<p>See how we stick all the constants together in a giant vector? This
+answers the question of how we store them, but how do we retrieve them
+when the program is executing, and comes across an instruction like
+this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PRTS @hello</span><br></pre></td></tr></table></figure>
+<p>During the first pass of our assembler, it did the following:</p>
+<ol type="1">
+<li>It found <code>hello:</code> and verified it had no entry in the
+symbol table</li>
+<li>It saw the directive was <code>.asciiz</code>, which means to treat
+the next operand as a null-terminated string</li>
+<li>It parsed out <code>Hello</code>, removed the single-quotes</li>
+<li>Here’s the secret: it recorded the offset in the symbol table of
+where this string constant begins</li>
+<li>To retrieve a string constant, we do a lookup in the symbol table,
+and start reading bytes from there until we hit a <code>0</code></li>
+<li>The <code>PRTS</code> instruction knows to look in the read-only
+section</li>
+</ol>
+<p>This is how all null-terminated string systems (that I am aware of)
+work. A second way to deal with string constants is (shockingly)
+non-null-terminated strings. You can store the length of the constant
+along with it, or the end of the constant. These also work fine, but I
+find them more annoying to work with. Hence, we are using null
+terminated strings. =)</p>
+<p>There are a couple other rules for string constants:</p>
+<ol type="1">
+<li>The user must declare them in the <code>.data</code> segment</li>
+<li>All strings will be UTF-8 by default, terminated by a
+<code>0</code></li>
+<li>The format for declaring a string constant is:
+<code>my_string: .asciiz '&lt;string&gt;'</code></li>
+<li>In the <code>.code</code> segment, developers can use
+<code>@my_string</code> as an operand</li>
+</ol>
+<blockquote>
+<p>Why single quotes, you ask? Because getting <code>nom</code> to parse
+a single <code>"</code> was, er, making me not happy. At some point,
+I’ll figure out how to accept either <code>'</code> or
+<code>"</code>.</p>
+</blockquote>
+<blockquote>
+<p>Why the <code>z</code> at the end of <code>.asciiz</code>, you ask?
+In <code>MIPS</code> assembly, which we are shamelessly copying, there’s
+a second directive, <code>.ascii</code>. This declares a
+non-null-terminated string. Since <code>MIPS</code> assembly is our
+guide, more or less, we’re following its conventions.</p>
+</blockquote>
+<h2 id="moar-parsers">MOAR PARSERS!</h2>
+<p>Head over to <code>src/assembler/operand_parsers.rs</code>, and let’s
+write a parser for strings:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">named!(irstring&lt;CompleteStr, Token&gt;,</span><br><span class="line">    do_parse!(</span><br><span class="line">        tag!(<span class="string">&quot;&#x27;&quot;</span>) &gt;&gt;</span><br><span class="line">        content: take_until!(<span class="string">&quot;&#x27;&quot;</span>) &gt;&gt;</span><br><span class="line">        tag!(<span class="string">&quot;&#x27;&quot;</span>) &gt;&gt;</span><br><span class="line">        (</span><br><span class="line">            Token::IrString&#123; name: content.<span class="title function_ invoke__">to_string</span>() &#125;</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Why is it called IrString, you ask? To not conflict with Rust
+keywords. Ir stands for Iridium, so IridiumString.</p>
+</blockquote>
+<p>We also need to add <code>irstring</code> to the list of sub-parsers
+in the <code>operand</code> parser, like so:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">named!(<span class="keyword">pub</span> operand&lt;CompleteStr, Token&gt;,</span><br><span class="line">    alt!(</span><br><span class="line">        integer_operand |</span><br><span class="line">        label_usage |</span><br><span class="line">        register |</span><br><span class="line">        irstring</span><br><span class="line">    )</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_parse_string_operand</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">irstring</span>(<span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;&#x27;This is a test&#x27;&quot;</span>));</span><br><span class="line">    <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="directives">Directives</h2>
+<p>Remember, we are using a directive, not an opcode. The directive is
+of this form: <code>label: .asciiz 'String content'</code>. A quick peek
+at our <code>directive_combined</code> parser reveals that we are not
+allowing for an optional label:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">named!(directive_combined&lt;CompleteStr, AssemblerInstruction&gt;,</span><br><span class="line">    ws!(</span><br><span class="line">        do_parse!(</span><br><span class="line">            tag!(<span class="string">&quot;.&quot;</span>) &gt;&gt;</span><br><span class="line">            name: directive_declaration &gt;&gt;</span><br><span class="line">            o1: opt!(operand) &gt;&gt;</span><br><span class="line">            o2: opt!(operand) &gt;&gt;</span><br><span class="line">            o3: opt!(operand) &gt;&gt;</span><br><span class="line">            (</span><br><span class="line">                AssemblerInstruction&#123;</span><br><span class="line">                    opcode: <span class="literal">None</span>,</span><br><span class="line">                    directive: <span class="title function_ invoke__">Some</span>(name),</span><br><span class="line">                    label: <span class="literal">None</span>,</span><br><span class="line">                    operand1: o1,</span><br><span class="line">                    operand2: o2,</span><br><span class="line">                    operand3: o3,</span><br><span class="line">                &#125;</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>There’s a bug in <code>directive_combined</code>. Note how we have
+<code>tag!(".")</code> and then <code>directive_declaration</code>,
+which also has a <code>tag!(".")</code>. The net effect is that we are
+looking for ... Let’s remove this one.</p>
+</blockquote>
+<p>We can add in a quick <code>opt!</code> like so:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> assembler::label_parsers::label_declaration;</span><br><span class="line"></span><br><span class="line">named!(directive_combined&lt;CompleteStr, AssemblerInstruction&gt;,</span><br><span class="line">    ws!(</span><br><span class="line">        do_parse!(</span><br><span class="line">            l: opt!(label_declaration) &gt;&gt;</span><br><span class="line">            name: directive_declaration &gt;&gt;</span><br><span class="line">            o1: opt!(operand) &gt;&gt;</span><br><span class="line">            o2: opt!(operand) &gt;&gt;</span><br><span class="line">            o3: opt!(operand) &gt;&gt;</span><br><span class="line">            (</span><br><span class="line">                AssemblerInstruction&#123;</span><br><span class="line">                    opcode: <span class="literal">None</span>,</span><br><span class="line">                    directive: <span class="title function_ invoke__">Some</span>(name),</span><br><span class="line">                    label: l,</span><br><span class="line">                    operand1: o1,</span><br><span class="line">                    operand2: o2,</span><br><span class="line">                    operand3: o3,</span><br><span class="line">                &#125;</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_string_directive</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">directive_combined</span>(<span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;test: .asciiz &#x27;Hello&#x27;&quot;</span>));</span><br><span class="line">    <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">    <span class="keyword">let</span> (_, directive) = result.<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Yes, this is the what the result should be</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">correct_instruction</span> =</span><br><span class="line">        AssemblerInstruction &#123;</span><br><span class="line">            opcode: <span class="literal">None</span>,</span><br><span class="line">            label: <span class="title function_ invoke__">Some</span>(</span><br><span class="line">                Token::LabelDeclaration &#123;</span><br><span class="line">                    name: <span class="string">&quot;test&quot;</span>.<span class="title function_ invoke__">to_string</span>()</span><br><span class="line">                &#125;),</span><br><span class="line">            directive: <span class="title function_ invoke__">Some</span>(</span><br><span class="line">                Token::Directive &#123;</span><br><span class="line">                    name: <span class="string">&quot;asciiz&quot;</span>.<span class="title function_ invoke__">to_string</span>()</span><br><span class="line">                &#125;),</span><br><span class="line">            operand1: <span class="title function_ invoke__">Some</span>(Token::IrString &#123; name: <span class="string">&quot;Hello&quot;</span>.<span class="title function_ invoke__">to_string</span>() &#125;),</span><br><span class="line">            operand2: <span class="literal">None</span>,</span><br><span class="line">            operand3: <span class="literal">None</span> &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">assert_eq!</span>(directive, correct_instruction);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="finally">FINALLY</h2>
+<p>OK, I think we are ready to try a test program with a string
+declaration in it now. Something simple, like:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.data</span><br><span class="line">hello: .asciiz &#x27;Hello everyone!&#x27;</span><br><span class="line">.code</span><br><span class="line">hlt</span><br></pre></td></tr></table></figure>
+<p>Wait! I have a great idea! Let’s put that in as a test in
+<code>program_parsers!</code> =)</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_complete_program</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">test_program</span> = <span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;.data\nhello: .asciiz &#x27;Hello everyone!&#x27;\n.code\nhlt&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">program</span>(test_program);</span><br><span class="line">    <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="assembler">Assembler</h2>
+<p>The parser is parsing, now we need to teach the assembler what to do
+with a string constant. The assembler is going to maintain a ·. When it
+finds a string constant, it converts each character to bytes and appends
+to the read-only data. When there are no more characters, it will add in
+<code>0</code> (<em>which is the <strong>numerical</strong> zero,
+<strong>not</strong> the ASCII or UTF-8 string "0"!</em>) to the end. It
+will also record the offset at which that constant begins and place it
+in the symbol table.</p>
+<blockquote>
+<p>Even though we are working with UTF-8, you should get into the habit
+of thinking of UTF encodings as taking 1 or more bytes. After all, there
+is UTF-16 and UTF-32.</p>
+</blockquote>
+<h2 id="two-pass-assembler">Two-Pass Assembler</h2>
+<p>I think it will be easier if I just show you the complete two-pass
+assembler and go over it. Here’s the declaration:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Debug, Default)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">Assembler</span> &#123;</span><br><span class="line">    <span class="comment">/// Tracks which phase the assember is in</span></span><br><span class="line">    phase: AssemblerPhase,</span><br><span class="line">    <span class="comment">/// Symbol table for constants and variables</span></span><br><span class="line">    <span class="keyword">pub</span> symbols: SymbolTable,</span><br><span class="line">    <span class="comment">/// The read-only data section constants are put in</span></span><br><span class="line">    <span class="keyword">pub</span> ro: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;,</span><br><span class="line">    <span class="comment">/// The compiled bytecode generated from the assembly instructions</span></span><br><span class="line">    <span class="keyword">pub</span> bytecode: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;,</span><br><span class="line">    <span class="comment">/// Tracks the current offset of the read-only section</span></span><br><span class="line">    ro_offset: <span class="type">u32</span>,</span><br><span class="line">    <span class="comment">/// A list of all the sections we&#x27;ve seen in the code</span></span><br><span class="line">    sections: <span class="type">Vec</span>&lt;AssemblerSection&gt;,</span><br><span class="line">    <span class="comment">/// The current section the assembler is in</span></span><br><span class="line">    current_section: <span class="type">Option</span>&lt;AssemblerSection&gt;,</span><br><span class="line">    <span class="comment">/// The current instruction the assembler is converting to bytecode</span></span><br><span class="line">    current_instruction: <span class="type">u32</span>,</span><br><span class="line">    <span class="comment">/// Any errors we find along the way. At the end, we&#x27;ll present them to the user.</span></span><br><span class="line">    errors: <span class="type">Vec</span>&lt;AssemblerError&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>I’m not certain we’ll need to keep <code>ro_offset</code> and
+<code>sections</code>.</p>
+<h3 id="impl-block">impl block</h3>
+<p>Let’s start going through the functions we implement for our
+assembler one by one. I’ll do a top-down approach, where we start with
+the highest-level function and follow it through to the smaller
+functions.</p>
+<h3 id="assemble">assemble()</h3>
+<p>This is the public function most things would call if they want to
+turn a raw string into bytecode. The <code>raw</code> parameter is the
+entire program in string format. It returns either a
+<code>Vec&lt;u8&gt;</code> or a
+<code>Vec&lt;AssemblerError&gt;</code>.</p>
+<blockquote>
+<p>As you read through this code, you might wonder why we aren’t
+returning many values. Its because as the assembler parses through the
+code, it is manipulating its own internal data structures, such as
+adding data to <code>ro</code>. I did it this way because it seemed to
+work better with Rust’s ownership system versus trying to pass
+references all around.</p>
+</blockquote>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">assemble</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, raw: &amp;<span class="type">str</span>) <span class="punctuation">-&gt;</span> <span class="type">Result</span>&lt;<span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;, <span class="type">Vec</span>&lt;AssemblerError&gt;&gt; &#123;</span><br><span class="line">    <span class="comment">// Runs the raw program through our `nom` parser</span></span><br><span class="line">    <span class="keyword">match</span> <span class="title function_ invoke__">program</span>(<span class="title function_ invoke__">CompleteStr</span>(raw)) &#123;</span><br><span class="line">        <span class="comment">// If there were no parsing errors, we now have a `Vec&lt;AssemblyInstructions&gt;` to process.</span></span><br><span class="line">        <span class="comment">// `remainder` _should_ be &quot;&quot;.</span></span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> Add a check for `remainder`, make sure it is &quot;&quot;.</span></span><br><span class="line">        <span class="title function_ invoke__">Ok</span>((_remainder, program)) =&gt; &#123;</span><br><span class="line">            <span class="comment">// First get the header so we can smush it into the bytecode later</span></span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">assembled_program</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">write_pie_header</span>();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Start processing the AssembledInstructions. This is the first pass of our two-pass assembler.</span></span><br><span class="line">            <span class="comment">// We pass a read-only reference down to another function.</span></span><br><span class="line">            <span class="keyword">self</span>.<span class="title function_ invoke__">process_first_phase</span>(&amp;program);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// If we accumulated any errors in the first pass, return them and don&#x27;t try to do the second pass</span></span><br><span class="line">            <span class="keyword">if</span> !<span class="keyword">self</span>.errors.<span class="title function_ invoke__">is_empty</span>() &#123;</span><br><span class="line">                <span class="comment">// <span class="doctag">TODO:</span> Can we avoid a clone here?</span></span><br><span class="line">                <span class="keyword">return</span> <span class="title function_ invoke__">Err</span>(<span class="keyword">self</span>.errors.<span class="title function_ invoke__">clone</span>());</span><br><span class="line">            &#125;;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Make sure that we have at least one data section and one code section</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">self</span>.sections.<span class="title function_ invoke__">len</span>() != <span class="number">2</span> &#123;</span><br><span class="line">                <span class="comment">// <span class="doctag">TODO:</span> Detail out which one(s) are missing</span></span><br><span class="line">                <span class="built_in">println!</span>(<span class="string">&quot;Did not find at least two sections.&quot;</span>);</span><br><span class="line">                <span class="keyword">self</span>.errors.<span class="title function_ invoke__">push</span>(AssemblerError::InsufficientSections);</span><br><span class="line">                <span class="comment">// <span class="doctag">TODO:</span> Can we avoid a clone here?</span></span><br><span class="line">                <span class="keyword">return</span> <span class="title function_ invoke__">Err</span>(<span class="keyword">self</span>.errors.<span class="title function_ invoke__">clone</span>());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// Run the second pass, which translates opcodes and associated operands into the bytecode</span></span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">body</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">process_second_phase</span>(&amp;program);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Merge the header with the populated body vector</span></span><br><span class="line">            assembled_program.<span class="title function_ invoke__">append</span>(&amp;<span class="keyword">mut</span> body);</span><br><span class="line">            <span class="title function_ invoke__">Ok</span>(assembled_program)</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="comment">// If there were parsing errors, bad syntax, etc, this arm is run</span></span><br><span class="line">        <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;There was an error parsing the code: &#123;:?&#125;&quot;</span>, e);</span><br><span class="line">            <span class="title function_ invoke__">Err</span>(<span class="built_in">vec!</span>[AssemblerError::ParseError&#123; error: e.<span class="title function_ invoke__">to_string</span>() &#125;])</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="process_first_phase">process_first_phase()</h3>
+<p>This function has two jobs:</p>
+<ol type="1">
+<li>Label declarations (e.g., <code>name:</code>)</li>
+<li>Directives (e.g., <code>.data</code>)</li>
+</ol>
+<p>In the first phase, we care the most about finding all the label
+declarations to put them in the symbol table, and making sure we
+everything is in a segment. I’ve commented this function heavily, so
+read through it.</p>
+<blockquote>
+<p>For handling errors, I chose to accumulate them into a list on the
+Assembler and process as much as possible. An alternative strategy would
+be to bail out at the first error. I chose to do it this way because I
+thought it might be good for the user to be able to see all the errors
+at once, instead of having to do a tedious fix-test-fix-repeat
+cycle.</p>
+</blockquote>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Runs the first pass of the two-pass assembling process. It looks for labels and puts them in the symbol table</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">process_first_phase</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, p: &amp;Program) &#123;</span><br><span class="line">    <span class="comment">// Iterate over every instruction, even though in the first phase we care about labels and directives but nothing else</span></span><br><span class="line">    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> &amp;p.instructions &#123;</span><br><span class="line">        <span class="keyword">if</span> i.<span class="title function_ invoke__">is_label</span>() &#123;</span><br><span class="line">            <span class="comment">// <span class="doctag">TODO:</span> Factor this out into another function? Put it in `process_label_declaration`?</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">self</span>.current_section.<span class="title function_ invoke__">is_some</span>() &#123;</span><br><span class="line">                <span class="comment">// If we have hit a segment header already (e.g., `.code`) then we are ok</span></span><br><span class="line">                <span class="keyword">self</span>.<span class="title function_ invoke__">process_label_declaration</span>(&amp;i);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// If we have not hit a segment header yet, then we have a label outside of a segment, which is not allowed</span></span><br><span class="line">                <span class="keyword">self</span>.errors.<span class="title function_ invoke__">push</span>(AssemblerError::NoSegmentDeclarationFound&#123;instruction: <span class="keyword">self</span>.current_instruction&#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> i.<span class="title function_ invoke__">is_directive</span>() &#123;</span><br><span class="line">            <span class="keyword">self</span>.<span class="title function_ invoke__">process_directive</span>(i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// This is used to keep track of which instruction we hit an error on</span></span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> Do we really need to track this?</span></span><br><span class="line">        <span class="keyword">self</span>.current_instruction += <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Once we&#x27;re done with this function, set the phase to second</span></span><br><span class="line">    <span class="keyword">self</span>.phase = AssemblerPhase::Second;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="process_label_directive">process_label_directive()</h3>
+<p>We call this function when the assembler finds a directive that is a
+label declaration:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Handles the declaration of a label such as:</span></span><br><span class="line"><span class="comment">/// hello: .asciiz &#x27;Hello&#x27;</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">process_label_declaration</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, i: &amp;AssemblerInstruction) &#123;</span><br><span class="line">    <span class="comment">// Check if the label is None or String</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">name</span> = <span class="keyword">match</span> i.<span class="title function_ invoke__">get_label_name</span>() &#123;</span><br><span class="line">        <span class="title function_ invoke__">Some</span>(name) =&gt; &#123; name &#125;,</span><br><span class="line">        <span class="literal">None</span> =&gt; &#123;</span><br><span class="line">            <span class="keyword">self</span>.errors.<span class="title function_ invoke__">push</span>(AssemblerError::StringConstantDeclaredWithoutLabel&#123;instruction: <span class="keyword">self</span>.current_instruction&#125;);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check if label is already in use (has an entry in the symbol table)</span></span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Is there a cleaner way to do this?</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">self</span>.symbols.<span class="title function_ invoke__">has_symbol</span>(&amp;name) &#123;</span><br><span class="line">        <span class="keyword">self</span>.errors.<span class="title function_ invoke__">push</span>(AssemblerError::SymbolAlreadyDeclared);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If we make it here, it isn&#x27;t a symbol we&#x27;ve seen before, so stick it in the table</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">symbol</span> = Symbol::<span class="title function_ invoke__">new</span>(name, SymbolType::Label);</span><br><span class="line">    <span class="keyword">self</span>.symbols.<span class="title function_ invoke__">add_symbol</span>(symbol);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="process_second_phase">process_second_phase()</h2>
+<p>This begins the second pass of the assembler, and it does quite a bit
+of work:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">process_second_phase</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, p: &amp;Program) <span class="punctuation">-&gt;</span> <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt; &#123;</span><br><span class="line">    <span class="comment">// Restart the counting of instructions</span></span><br><span class="line">    <span class="keyword">self</span>.current_instruction = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// We&#x27;re going to put the bytecode meant to be executed in a separate Vec so we can do some post-processing and then merge it with the header and read-only sections</span></span><br><span class="line">    <span class="comment">// Examples could be optimizations, additional checks, whatever</span></span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">program</span> = <span class="built_in">vec!</span>[];</span><br><span class="line">    <span class="comment">// Same as in first pass, except in the second pass we care about opcodes and directives</span></span><br><span class="line">    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> &amp;p.instructions &#123;</span><br><span class="line">        <span class="keyword">if</span> i.<span class="title function_ invoke__">is_opcode</span>() &#123;</span><br><span class="line">            <span class="comment">// Opcodes know how to properly transform themselves into 32-bits, so we can just call `to_bytes` and append to our program</span></span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">bytes</span> = i.<span class="title function_ invoke__">to_bytes</span>(&amp;<span class="keyword">self</span>.symbols);</span><br><span class="line">            program.<span class="title function_ invoke__">append</span>(&amp;<span class="keyword">mut</span> bytes);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> i.<span class="title function_ invoke__">is_directive</span>() &#123;</span><br><span class="line">            <span class="comment">// In this phase, we can have directives but of different types than we care about in the first pass. The Directive itself can check which pass the Assembler</span></span><br><span class="line">            <span class="comment">// is in and decide what to do about it</span></span><br><span class="line">            <span class="keyword">self</span>.<span class="title function_ invoke__">process_directive</span>(i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">self</span>.current_instruction += <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">    program</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="process_directive">process_directive()</h3>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">process_directive</span>( &amp; <span class="keyword">mut</span> <span class="keyword">self</span>, i:  &amp; AssemblerInstruction) &#123; <span class="comment">// First let’s make sure we have a parseable name</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">directive_name</span> = <span class="keyword">match</span> i.<span class="title function_ invoke__">get_directive_name</span>() &#123;</span><br><span class="line">        <span class="title function_ invoke__">Some</span>(name)⇒ &#123;</span><br><span class="line">            name</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="literal">None</span> ⇒ &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;Directive has an invalid name: &#123;:?&#125;&quot;</span>, i);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">// Now check if there were any operands.</span></span><br><span class="line">    <span class="keyword">if</span> i.<span class="title function_ invoke__">has_operands</span>() &#123;</span><br><span class="line">        <span class="comment">// If it _does_ have operands, we need to figure out which directive it was</span></span><br><span class="line">        <span class="keyword">match</span> directive_name.<span class="title function_ invoke__">as_ref</span>() &#123;</span><br><span class="line">            <span class="comment">// If this is the operand, we&#x27;re declaring a null terminated string</span></span><br><span class="line">            <span class="string">&quot;asciiz&quot;</span> =&gt; &#123;</span><br><span class="line">                <span class="keyword">self</span>.<span class="title function_ invoke__">handle_asciiz</span>(i);</span><br><span class="line">            &#125;</span><br><span class="line">            _ =&gt; &#123;</span><br><span class="line">                <span class="keyword">self</span>.errors.<span class="title function_ invoke__">push</span>(AssemblerError::UnknownDirectiveFound &#123;</span><br><span class="line">                    directive: directive_name.<span class="title function_ invoke__">clone</span>()</span><br><span class="line">                &#125;);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// If there were not any operands, (e.g., `.code`), then we know it is a section header</span></span><br><span class="line">        <span class="keyword">self</span>.<span class="title function_ invoke__">process_section_header</span>( &amp; directive_name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="process_section_header">process_section_header()</h3>
+<p>This little function just processes any new section declarations.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Handles a declaration of a section header, such as:</span></span><br><span class="line"><span class="comment">/// .code</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">process_section_header</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, header_name: &amp;<span class="type">str</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">new_section</span>: AssemblerSection = header_name.<span class="title function_ invoke__">into</span>();</span><br><span class="line">    <span class="comment">// Only specific section names are allowed</span></span><br><span class="line">    <span class="keyword">if</span> new_section == AssemblerSection::Unknown &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Found an section header that is unknown: &#123;:#?&#125;&quot;</span>, header_name);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Check if we really need to keep a list of all sections seen</span></span><br><span class="line">    <span class="keyword">self</span>.sections.<span class="title function_ invoke__">push</span>(new_section.<span class="title function_ invoke__">clone</span>());</span><br><span class="line">    <span class="keyword">self</span>.current_section = <span class="title function_ invoke__">Some</span>(new_section);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="handle_asciiz">handle_asciiz()</h3>
+<p>This function is called to handle declarations of string constants.
+Its heavily commented, so read carefully.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Handles a declaration of a null-terminated string:</span></span><br><span class="line"><span class="comment">/// hello: .asciiz &#x27;Hello!&#x27;</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">handle_asciiz</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, i: &amp;AssemblerInstruction) &#123;</span><br><span class="line">    <span class="comment">// Being a constant declaration, this is only meaningful in the first pass</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">self</span>.phase != AssemblerPhase::First &#123; <span class="keyword">return</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// In this case, operand1 will have the entire string we need to read in to RO memory</span></span><br><span class="line">    <span class="keyword">match</span> i.<span class="title function_ invoke__">get_string_constant</span>() &#123;</span><br><span class="line">        <span class="title function_ invoke__">Some</span>(s) =&gt; &#123;</span><br><span class="line">            <span class="keyword">match</span> i.<span class="title function_ invoke__">get_label_name</span>() &#123;</span><br><span class="line">                <span class="title function_ invoke__">Some</span>(name) =&gt; &#123; <span class="keyword">self</span>.symbols.<span class="title function_ invoke__">set_symbol_offset</span>(&amp;name, <span class="keyword">self</span>.ro_offset); &#125;</span><br><span class="line">                <span class="literal">None</span> =&gt; &#123;</span><br><span class="line">                    <span class="comment">// This would be someone typing:</span></span><br><span class="line">                    <span class="comment">// .asciiz &#x27;Hello&#x27;</span></span><br><span class="line">                    <span class="built_in">println!</span>(<span class="string">&quot;Found a string constant with no associated label!&quot;</span>);</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">            <span class="comment">// We&#x27;ll read the string into the read-only section byte-by-byte</span></span><br><span class="line">            <span class="keyword">for</span> <span class="variable">byte</span> <span class="keyword">in</span> s.<span class="title function_ invoke__">as_bytes</span>() &#123;</span><br><span class="line">                <span class="keyword">self</span>.ro.<span class="title function_ invoke__">push</span>(*byte);</span><br><span class="line">                <span class="keyword">self</span>.ro_offset += <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// This is the null termination bit we are using to indicate a string has ended</span></span><br><span class="line">            <span class="keyword">self</span>.ro.<span class="title function_ invoke__">push</span>(<span class="number">0</span>);</span><br><span class="line">            <span class="keyword">self</span>.ro_offset += <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="literal">None</span> =&gt; &#123;</span><br><span class="line">            <span class="comment">// This just means someone typed `.asciiz` for some reason</span></span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;String constant following an .asciiz was empty&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="prts-code">PRTS code</h2>
+<p>Now that we have stuff stored in the read-only section, it’d be handy
+to be able to read it. So let’s add a new opcode with this
+implementation:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Opcode::PRTS =&gt; &#123;</span><br><span class="line">    <span class="comment">// PRTS takes one operand, either a starting index in the read-only section of the bytecode</span></span><br><span class="line">    <span class="comment">// or a symbol (in the form of @symbol_name), which will look up the offset in the symbol table.</span></span><br><span class="line">    <span class="comment">// This instruction then reads each byte and prints it, until it comes to a 0x00 byte, which indicates</span></span><br><span class="line">    <span class="comment">// termination of the string</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">starting_offset</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">next_16_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">ending_offset</span> = starting_offset;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">slice</span> = <span class="keyword">self</span>.ro_data.<span class="title function_ invoke__">as_slice</span>();</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Find a better way to do this. Maybe we can store the byte length and not null terminate? Or some form of caching where we</span></span><br><span class="line">    <span class="comment">// go through the entire ro_data on VM startup and find every string and its ending byte location?</span></span><br><span class="line">    <span class="keyword">while</span> slice[ending_offset] != <span class="number">0</span> &#123;</span><br><span class="line">        ending_offset += <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = std::<span class="type">str</span>::<span class="title function_ invoke__">from_utf8</span>(&amp;slice[starting_offset..ending_offset]);</span><br><span class="line">    <span class="keyword">match</span> result &#123;</span><br><span class="line">        <span class="title function_ invoke__">Ok</span>(s) =&gt; &#123; <span class="built_in">print!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, s); &#125;</span><br><span class="line">        <span class="title function_ invoke__">Err</span>(e) =&gt; &#123; <span class="built_in">println!</span>(<span class="string">&quot;Error decoding string for prts instruction: &#123;:#?&#125;&quot;</span>, e) &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="assemblererror">AssemblerError</h2>
+<p>You probably noticed that we are using a custom error type. I started
+using those for this part of the tutorial, because the project has grown
+large and complex enough that I think we need it. Rather than pasting
+the entire file contents, I am going to point you to the file in the
+repo, since article is almost at 3k words. =)</p>
+<p>You can find the AssemblerError module here: <a
+target="_blank" rel="noopener" href="https://gitlab.com/subnetzero/iridium/blob/master/src/assembler/assembler_errors.rs">assembler_errors.rs</a></p>
+<blockquote>
+<p>Using the AssemblerError will require changing some of the match arms
+from <code>Some(whatever)</code> to <code>Ok(whatever)</code>.</p>
+</blockquote>
+<h2 id="symbols.rs">symbols.rs</h2>
+<p>You’ll also notice that I split all the symbol table code out into
+its own file, <code>src/assembly/symbols.rs</code>. You can see it here:
+<a
+target="_blank" rel="noopener" href="https://gitlab.com/subnetzero/iridium/blob/master/src/assembler/symbols.rs">symbols.rs</a></p>
+<h2 id="end">End</h2>
+<p>There were some other tweaks and changes I made that I didn’t cover
+in this tutorial. If your version isn’t working for some reason, I
+suggest pulling a fresh copy from the repo. The code as it should be up
+through this tutorial is tagged as 0.0.16 in GitLab.</p>
+<p>This is a good stopping point in the series for a few weeks. There’s
+another tutorial series I want to start on. I have littered the Iridium
+codebase with <code>// TODO: &lt;stuff&gt;</code> notes, and I’ll try to
+open tickets in the GitLab issue tracker for each of them. If you’d like
+to contribute <strong>anything</strong> (code, spelling/grammar
+corrections, more rusty ways of doing things, anything at all), please
+feel free to do a MR and ping me for help or questions if needed.</p>
+<p>Another reason I am taking a short break from this project is that I
+need to think about what to do next. We could continue with the language
+aspect and build a higher-level, Python-esque language on top of what we
+have now. Or we could focus on the VM itself, and start adding in
+features like parallelism and clustering. If you have thoughts/ideas
+about that, feel free to post them or e-mail me.</p>
+<p>Hope you enjoyed this series and are looking forward to the next
+one!</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/16/">https://animenzzzzzz.github.io/pages/build-your-own-vm/16/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/15/" title="Assembler CLI Improvements"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Assembler CLI Improvements</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/17/" title="Basic Threads"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Basic Threads</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/03/" title="More Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">More Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#home-stretch"><span class="toc-number">1.</span> <span class="toc-text">Home Stretch</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#string-constants"><span class="toc-number">2.</span> <span class="toc-text">String Constants</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#read-only-section"><span class="toc-number">2.1.</span> <span class="toc-text">Read-Only Section</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#moar-parsers"><span class="toc-number">3.</span> <span class="toc-text">MOAR PARSERS!</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#directives"><span class="toc-number">4.</span> <span class="toc-text">Directives</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#finally"><span class="toc-number">5.</span> <span class="toc-text">FINALLY</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#assembler"><span class="toc-number">6.</span> <span class="toc-text">Assembler</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#two-pass-assembler"><span class="toc-number">7.</span> <span class="toc-text">Two-Pass Assembler</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#impl-block"><span class="toc-number">7.1.</span> <span class="toc-text">impl block</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#assemble"><span class="toc-number">7.2.</span> <span class="toc-text">assemble()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#process_first_phase"><span class="toc-number">7.3.</span> <span class="toc-text">process_first_phase()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#process_label_directive"><span class="toc-number">7.4.</span> <span class="toc-text">process_label_directive()</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#process_second_phase"><span class="toc-number">8.</span> <span class="toc-text">process_second_phase()</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#process_directive"><span class="toc-number">8.1.</span> <span class="toc-text">process_directive()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#process_section_header"><span class="toc-number">8.2.</span> <span class="toc-text">process_section_header()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#handle_asciiz"><span class="toc-number">8.3.</span> <span class="toc-text">handle_asciiz()</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#prts-code"><span class="toc-number">9.</span> <span class="toc-text">PRTS code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#assemblererror"><span class="toc-number">10.</span> <span class="toc-text">AssemblerError</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#symbols.rs"><span class="toc-number">11.</span> <span class="toc-text">symbols.rs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#end"><span class="toc-number">12.</span> <span class="toc-text">End</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

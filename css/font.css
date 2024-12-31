@@ -8,6 +8,11 @@
     font-display: swap;
     src: url('../font/PingFangSC-Regular.woff2') format("truetype");
 }
+@font-face{
+    font-family: 'Inter';
+    font-display: swap;
+    src: url('../font/Inter.woff2') format("truetype");
+}
 body {
-    font-family: 'JetBrains Mono';
+    font-family: 'Inter';
 }

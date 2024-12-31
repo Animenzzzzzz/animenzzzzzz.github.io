@@ -1,0 +1,308 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>More Basic Opcodes | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Even More Opcodes! Right now, our VM can do one thing: halt. An important feature to be sure, but we should probably add in more opcodes to do things like, oh, load, add, multiple, etc. LOAD It’s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="More Basic Opcodes">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/03/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="Even More Opcodes! Right now, our VM can do one thing: halt. An important feature to be sure, but we should probably add in more opcodes to do things like, oh, load, add, multiple, etc. LOAD It’s">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2024-12-20T08:20:24.000Z">
+<meta property="article:modified_time" content="2024-12-24T03:19:57.695Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/03/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'More Basic Opcodes',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-12-24 11:19:57'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">More Basic Opcodes</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-20T08:20:24.000Z" title="发表于 2024-12-20 16:20:24">2024-12-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-24T03:19:57.695Z" title="更新于 2024-12-24 11:19:57">2024-12-24</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="More Basic Opcodes"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="even-more-opcodes">Even More Opcodes!</h2>
+<p>Right now, our VM can do one thing: halt. An important feature to be
+sure, but we should probably add in more opcodes to do things like, oh,
+load, add, multiple, etc.</p>
+<h2 id="load">LOAD</h2>
+<p>It’s about time those slacker registers start pulling their weight!
+In our future assembly language, the LOAD instruction will look
+like:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOAD $0 #500</span><br></pre></td></tr></table></figure>
+<p>This will tell our VM to load the number 500 into register 0.</p>
+<h2 id="breaking-up-is-hard-to-do">Breaking Up is Hard to Do</h2>
+<p>We have 32 bits to work with, and 16 are already spoken for:</p>
+<ul>
+<li>8 for the opcode</li>
+<li>8 for the register number</li>
+</ul>
+<p>That leaves us 16 bits to use to store the number. For now we care
+about unsigned integers, so the largest number we can store in a LOAD
+instruction is 2^16, or 65,536. Later on, we’ll need a way to handle
+larger numbers, but for now, we’ll keep our numbers below that.</p>
+<blockquote>
+<p>Our registers can store an i32, but expressing negative numbers as
+u8s requires a bit of explanation we’ll go into later.</p>
+</blockquote>
+<h2 id="to-the-code">To the Code!</h2>
+<p>These are the steps we need to take to process a LOAD opcode: 1.
+Decode the first 8 bits and see LOAD 2. Decode the next 8 bits and use
+it to get the register 3. Decode the next 16 bits (split into 2 u8s)
+into an integer 4. Store them in the register</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Opcode::LOAD =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>; <span class="comment">// We cast to usize so we can use it as an index into the array</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">number</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">next_16_bits</span>() <span class="keyword">as</span> <span class="type">u16</span>;</span><br><span class="line">    <span class="keyword">self</span>.registers[register] = number <span class="keyword">as</span> <span class="type">i32</span>; <span class="comment">// Our registers are i32s, so we need to cast it. We&#x27;ll cover that later.</span></span><br><span class="line">    <span class="keyword">continue</span>; <span class="comment">// Start another iteration of the loop. The next 8 bits waiting to be read should be an opcode.</span></span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<p>You’ll note the existence of some extra helper functions, next_8_bits
+and next_16_bits. You can add these to the VM impl block like so:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">next_8_bits</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">u8</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="keyword">self</span>.program[<span class="keyword">self</span>.pc];</span><br><span class="line">    <span class="keyword">self</span>.pc += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">next_16_bits</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">u16</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = ((<span class="keyword">self</span>.program[<span class="keyword">self</span>.pc] <span class="keyword">as</span> <span class="type">u16</span>) &lt;&lt; <span class="number">8</span>) | <span class="keyword">self</span>.program[<span class="keyword">self</span>.pc + <span class="number">1</span>] <span class="keyword">as</span> <span class="type">u16</span>;</span><br><span class="line">    <span class="keyword">self</span>.pc += <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>These are convenience functions to get the next 8 or 16 bits and
+increment the program counter.</p>
+<p>And that’s all there is to the LOAD opcode! Let’s write a test for
+it:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_load_opcode</span>() &#123;</span><br><span class="line">  <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">test_vm</span> = VM::<span class="title function_ invoke__">get_test_vm</span>();</span><br><span class="line">  test_vm.program = <span class="built_in">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">244</span>]; <span class="comment">// Remember, this is how we represent 500 using two u8s in little endian format</span></span><br><span class="line">  test_vm.<span class="title function_ invoke__">run</span>();</span><br><span class="line">  <span class="built_in">assert_eq!</span>(test_vm.registers[<span class="number">0</span>], <span class="number">500</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="a-brief-detour">A Brief Detour</h2>
+<p>Calling <code>run()</code> in our tests is fragile and pretty hacky.
+Let’s add in a function to let us execute one instruction. We could just
+copy and paste the whole run function and tweak it, but ewww. We can
+factor out the execution of the opcodes into a function:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Loops as long as instructions can be executed.</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">is_done</span> = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">while</span> !is_done &#123;</span><br><span class="line">        is_done = <span class="keyword">self</span>.<span class="title function_ invoke__">execute_instruction</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// Executes one instruction. Meant to allow for more controlled execution of the VM</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run_once</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) &#123;</span><br><span class="line">    <span class="keyword">self</span>.<span class="title function_ invoke__">execute_instruction</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">execute_instruction</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">bool</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">self</span>.pc &gt;= <span class="keyword">self</span>.program.<span class="title function_ invoke__">len</span>() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">match</span> <span class="keyword">self</span>.<span class="title function_ invoke__">decode_opcode</span>() &#123;</span><br><span class="line">        Opcode::LOAD =&gt; &#123;</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">register</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>;</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">number</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">next_16_bits</span>() <span class="keyword">as</span> <span class="type">u32</span>;</span><br><span class="line">            <span class="keyword">self</span>.registers[register] = number <span class="keyword">as</span> <span class="type">i32</span>;</span><br><span class="line">        &#125;,</span><br><span class="line">        Opcode::HLT =&gt; &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;HLT encountered&quot;</span>);</span><br><span class="line">            <span class="literal">false</span></span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>This adds in an additional function call to every iteration of the
+VM. In terms of performance, this isn’t good. When we start
+benchmarking, we’ll want to revisit this.</p>
+</blockquote>
+<h2 id="add">ADD</h2>
+<p>Now let’s code the ADD instruction. It has the following form: ADD $0
+$1 $2. The first two operands are the registers whose values we want to
+add, and the third register is where the value will end up. In our
+assembly language, if we wanted to load two numbers and add them, it
+might look like:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">LOAD $0 #10</span><br><span class="line">LOAD $1 #15</span><br><span class="line">ADD $0 $1 $2</span><br></pre></td></tr></table></figure>
+<p>Register 2 would have the value 25. ADD uses all 4 bytes of an
+instruction, so our code for it looks like:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Opcode::ADD =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register1</span> = <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register2</span> = <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>] = register1 + register2;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<h2 id="sub-mul-and-div">SUB, MUL and DIV</h2>
+<p>The SUB and MUL opcodes are identical to ADD, but the division is
+not. Because our registers hold u32 values, we cannot store a decimal
+result from division. Thus, we need to store the remainder. You may
+remember this from school: <code>8 / 5 = 1 remainder 3</code>.</p>
+<p>To deal with this need, we’re going to add another attribute to our
+VM, called remainder. Our new VM struct looks like this:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Debug)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">VM</span> &#123;</span><br><span class="line">    registers: [<span class="type">i32</span>; <span class="number">32</span>],</span><br><span class="line">    pc: <span class="type">usize</span>,</span><br><span class="line">    program: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;,</span><br><span class="line">    remainder: <span class="type">u32</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="div">DIV</h2>
+<p>When we come across a DIV opcode, what we want to do is divide it,
+store the quotient in the register, and the remainder in the remainder
+attribute of the VM. This makes our code for the DIV match arm a bit
+different:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Opcode::DIV =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register1</span> = <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register2</span> = <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>] = register1 / register2;</span><br><span class="line">    <span class="keyword">self</span>.remainder = (register1 % register2) <span class="keyword">as</span> <span class="type">u32</span>;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>You may be wondering what the % is. That is the modulo operator in
+Rust, and is how we get the remainder.</p>
+</blockquote>
+<h2 id="now-what">Now What?</h2>
+<p>We have a VM that can do some math! What more do you want?!</p>
+<p>Well, ok, we should probably add some more features in. In our next
+post, we’ll talk about jumping!</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/03/">https://animenzzzzzz.github.io/pages/build-your-own-vm/03/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Basic Opcodes</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Jumps</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a><a href="/pages/build-your-own-vm/06/" title="The REPL"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">The REPL</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#even-more-opcodes"><span class="toc-number">1.</span> <span class="toc-text">Even More Opcodes!</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#load"><span class="toc-number">2.</span> <span class="toc-text">LOAD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#breaking-up-is-hard-to-do"><span class="toc-number">3.</span> <span class="toc-text">Breaking Up is Hard to Do</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#to-the-code"><span class="toc-number">4.</span> <span class="toc-text">To the Code!</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#a-brief-detour"><span class="toc-number">5.</span> <span class="toc-text">A Brief Detour</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#add"><span class="toc-number">6.</span> <span class="toc-text">ADD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sub-mul-and-div"><span class="toc-number">7.</span> <span class="toc-text">SUB, MUL and DIV</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#div"><span class="toc-number">8.</span> <span class="toc-text">DIV</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#now-what"><span class="toc-number">9.</span> <span class="toc-text">Now What?</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

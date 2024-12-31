@@ -1,0 +1,319 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Assembler CLI Improvements | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="CLI Improvements Having to start the interpreter, then type .load_file, etc is cumbersome. Let’s change it so that the VM tries to execute the file given to it as an argument. There’s a super handy">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Assembler CLI Improvements">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/15/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="CLI Improvements Having to start the interpreter, then type .load_file, etc is cumbersome. Let’s change it so that the VM tries to execute the file given to it as an argument. There’s a super handy">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2024-12-26T03:40:07.000Z">
+<meta property="article:modified_time" content="2024-12-26T06:37:15.018Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/15/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Assembler CLI Improvements',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-12-26 14:37:15'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Assembler CLI Improvements</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-26T03:40:07.000Z" title="发表于 2024-12-26 11:40:07">2024-12-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-26T06:37:15.018Z" title="更新于 2024-12-26 14:37:15">2024-12-26</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Assembler CLI Improvements"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="cli-improvements">CLI Improvements</h2>
+<p>Having to start the interpreter, then type <code>.load_file</code>,
+etc is cumbersome. Let’s change it so that the VM tries to execute the
+file given to it as an argument. There’s a super handy-dandy crate
+called <code>clap</code> in Rust that will make this trivial. The
+behavior we want is:</p>
+<ul>
+<li>If the user types <em>iridium</em> and nothing else, they will go
+directly to a <code>REPL</code></li>
+<li>If the user types iridium <code>/path/to/valid/*.iasm</code>, that
+is, they want to execute a file of code directly, it should do that then
+exit</li>
+</ul>
+<blockquote>
+<p>If you want to be able to run the iridium executable from anywhere,
+you’ll want to drop it in <code>/usr/local/bin</code> or some other
+location on your PATH.</p>
+</blockquote>
+<h2 id="add-the-dependency">Add the Dependency</h2>
+<p>To your Cargo.toml file, add:</p>
+<figure class="highlight toml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">clap</span> = &#123; version = <span class="string">&quot;2.32&quot;</span>, features = [<span class="string">&quot;yaml&quot;</span>] &#125;</span><br></pre></td></tr></table></figure>
+<p>To learn all about <a
+target="_blank" rel="noopener" href="https://crates.io/crates/clap#quick-example">clap</a>, I’m going
+to recommend reading through their website. It’s well-written and should
+cover everything we need. If you want to skip, know that clap is a tool
+that makes it easy to write an app that works like a typical CLI
+command: flags, help, etc.</p>
+<h3 id="using-clap">Using clap</h3>
+<p>First, add the following to the top of <code>main.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">crate</span> clap;</span><br><span class="line"><span class="keyword">use</span> clap::&#123;Arg, App, SubCommand&#125;;</span><br></pre></td></tr></table></figure>
+<p>Next, we’ll factor out the code to start the <code>REPL</code>.
+Create this function in <code>main.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Starts a REPL that will run until the user kills it</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">start_repl</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">repl</span> = repl::REPL::<span class="title function_ invoke__">new</span>();</span><br><span class="line">    repl.<span class="title function_ invoke__">run</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>We’ll need a function to read data from a file. Put this in
+<code>main.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Attempts to read a file and return the contents. Exits if unable to read the file for any reason.</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">read_file</span>(tmp: &amp;<span class="type">str</span>) <span class="punctuation">-&gt;</span> <span class="type">String</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">filename</span> = Path::<span class="title function_ invoke__">new</span>(tmp);</span><br><span class="line">    <span class="keyword">match</span> File::<span class="title function_ invoke__">open</span>(Path::<span class="title function_ invoke__">new</span>(&amp;filename)) &#123;</span><br><span class="line">      <span class="title function_ invoke__">Ok</span>(<span class="keyword">mut</span> fh) =&gt; &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">contents</span> = <span class="type">String</span>::<span class="title function_ invoke__">new</span>();</span><br><span class="line">        <span class="keyword">match</span> fh.<span class="title function_ invoke__">read_to_string</span>(&amp;<span class="keyword">mut</span> contents) &#123;</span><br><span class="line">          <span class="title function_ invoke__">Ok</span>(_) =&gt; &#123;</span><br><span class="line">            <span class="keyword">return</span> contents;</span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;There was an error reading file: &#123;:?&#125;&quot;</span>, e);</span><br><span class="line">            std::process::<span class="title function_ invoke__">exit</span>(<span class="number">1</span>);</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;File not found: &#123;:?&#125;&quot;</span>, e);</span><br><span class="line">        std::process::<span class="title function_ invoke__">exit</span>(<span class="number">1</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Those are pretty boilerplate. Here’s the new <code>main()</code>
+function and imports:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> std::path::Path;</span><br><span class="line"><span class="keyword">use</span> std::fs::File;</span><br><span class="line"><span class="keyword">use</span> std::io::prelude::*;</span><br><span class="line"></span><br><span class="line"><span class="meta">#[macro_use]</span></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">crate</span> nom;</span><br><span class="line"></span><br><span class="line"><span class="meta">#[macro_use]</span></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">crate</span> clap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> clap::App;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> assembler;</span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> instruction;</span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> repl;</span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> vm;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">yaml</span> = load_yaml!(<span class="string">&quot;cli.yml&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">matches</span> = App::<span class="title function_ invoke__">from_yaml</span>(yaml).<span class="title function_ invoke__">get_matches</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">target_file</span> = matches.<span class="title function_ invoke__">value_of</span>(<span class="string">&quot;INPUT_FILE&quot;</span>);</span><br><span class="line">    <span class="keyword">match</span> target_file &#123;</span><br><span class="line">        <span class="title function_ invoke__">Some</span>(filename) =&gt; &#123;</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">program</span> = <span class="title function_ invoke__">read_file</span>(filename);</span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">asm</span> = assembler::Assembler::<span class="title function_ invoke__">new</span>();</span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">vm</span> = vm::VM::<span class="title function_ invoke__">new</span>();</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">program</span> = asm.<span class="title function_ invoke__">assemble</span>(&amp;program);</span><br><span class="line">            <span class="keyword">match</span> program &#123;</span><br><span class="line">                <span class="title function_ invoke__">Some</span>(p) =&gt; &#123;</span><br><span class="line">                    vm.<span class="title function_ invoke__">add_bytes</span>(p);</span><br><span class="line">                    vm.<span class="title function_ invoke__">run</span>();</span><br><span class="line">                    std::process::<span class="title function_ invoke__">exit</span>(<span class="number">0</span>);</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="literal">None</span> =&gt; &#123;&#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="literal">None</span> =&gt; &#123;</span><br><span class="line">            <span class="title function_ invoke__">start_repl</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>If the user types <em>iridium</em> <code>/something.iasm</code>, then
+this will try to:</p>
+<ol type="1">
+<li>Read data from that file</li>
+<li>Sends it through our <code>nom</code> parser</li>
+<li>If successful, adds it to the VM, runs it, then exits with a 0</li>
+</ol>
+<p>If they type <em>iridium</em>, a <code>REPL</code> starts.</p>
+<h3 id="cli.yml">cli.yml</h3>
+<p>I opted to have the config for this in <code>src/cli.yml</code>, but
+you can place it elsewhere or use a different config option. My example
+one is:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">name: iridium</span><br><span class="line">version: &quot;0.0.1&quot;</span><br><span class="line">author: Fletcher Haynes &lt;fletcher@subnetzero.io&gt;</span><br><span class="line">about: Interpreter for the Iridium language</span><br><span class="line">args:</span><br><span class="line">    - INPUT_FILE:</span><br><span class="line">        help: Path to the .iasm or .ir file to run</span><br><span class="line">        required: false</span><br><span class="line">        index: 1</span><br></pre></td></tr></table></figure>
+<p>But clap allows for two other methods: code and macro. Feel free to
+customize if you want.</p>
+<h2 id="makefile">Makefile</h2>
+<p>I’ve left my Makefile in the repo, so you can use it to help install
+the binaries in <code>/usr/local/bin/</code> if you want.</p>
+<h2 id="epie-header">EPIE Header</h2>
+<p>Since we have some words left in this part, let’s teach our assembler
+how to write out the PIE header. Let’s add some needed constants to the
+top of <code>src/assembler/mod.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> PIE_HEADER_PREFIX: [<span class="type">u8</span>; <span class="number">4</span>] = [<span class="number">45</span>, <span class="number">50</span>, <span class="number">49</span>, <span class="number">45</span>];</span><br><span class="line"><span class="keyword">const</span> PIE_HEADER_LENGTH: <span class="type">usize</span> = <span class="number">64</span>;</span><br></pre></td></tr></table></figure>
+<p>In the <code>impl</code> for <code>Assembler</code>, add this
+function:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">write_pie_header</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">header</span> = <span class="built_in">vec!</span>[];</span><br><span class="line">    <span class="keyword">for</span> <span class="variable">byte</span> <span class="keyword">in</span> PIE_HEADER_PREFIX.<span class="title function_ invoke__">into_iter</span>() &#123;</span><br><span class="line">        header.<span class="title function_ invoke__">push</span>(byte.<span class="title function_ invoke__">clone</span>());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> header.<span class="title function_ invoke__">len</span>() &lt;= PIE_HEADER_LENGTH &#123;</span><br><span class="line">        header.<span class="title function_ invoke__">push</span>(<span class="number">0</span> <span class="keyword">as</span> <span class="type">u8</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    header</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This will write out our header, which right now is 4 bytes and 60 0s.
+Its important to pad the header so that we can use those bytes later if
+needed. The last function in the <code>Assembler</code>
+<code>impl</code> we need to tweak is <code>assemble</code>, so that it
+actually uses the header generator:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Don&#x27;t forget to add this at the top of the file too</span></span><br><span class="line"><span class="keyword">use</span> assembler::PIE_HEADER_PREFIX;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">assemble</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, raw: &amp;<span class="type">str</span>) <span class="punctuation">-&gt;</span> <span class="type">Option</span>&lt;<span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;&gt; &#123;</span><br><span class="line">    <span class="keyword">match</span> <span class="title function_ invoke__">program</span>(<span class="title function_ invoke__">CompleteStr</span>(raw)) &#123;</span><br><span class="line">        <span class="title function_ invoke__">Ok</span>((_remainder, program)) =&gt; &#123;</span><br><span class="line">            <span class="comment">// First get the header so we can smush it into the bytecode letter</span></span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">assembled_program</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">write_pie_header</span>();</span><br><span class="line">            <span class="keyword">self</span>.<span class="title function_ invoke__">process_first_phase</span>(&amp;program);</span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">body</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">process_second_phase</span>(&amp;program);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Merge the header with the populated body vector</span></span><br><span class="line">            assembled_program.<span class="title function_ invoke__">append</span>(&amp;<span class="keyword">mut</span> body);</span><br><span class="line">            <span class="title function_ invoke__">Some</span>(assembled_program)</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;There was an error assembling the code: &#123;:?&#125;&quot;</span>, e);</span><br><span class="line">            <span class="literal">None</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Now if you run <code>cargo test</code>, you’ll notice that
+<code>test_bytes_assemble</code> fails. This is because we have added 64
+bytes. Change the 28 to a 92 in that test for now.</p>
+<h2 id="the-vm">The VM</h2>
+<p>Of course, our VM doesn’t know yet to look for the header. We can add
+a <code>verify_header</code> function to it. In <code>src/vm.rs</code>,
+add this to the <code>impl</code> of the <code>VM</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Processes the header of bytecode the VM wants to execute</span></span><br><span class="line"><span class="keyword">use</span> crate::assembler::PIE_HEADER_PREFIX;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">verify_header</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">bool</span> &#123;</span><br><span class="line">    <span class="keyword">self</span>.program[<span class="number">0</span>..<span class="number">4</span>] == PIE_HEADER_PREFIX</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Last, we’ll set the VM’s <code>Program Counter</code> to 65, since we
+don’t yet have anything to do with the header.</p>
+<h3 id="broken-tests">Broken Tests</h3>
+<p>These changes will break any of the tests in vm.rs that use
+<code>vm.run()</code> as opposed to <code>vm.run_once()</code>. Why?
+Because <code>vm.run()</code> now contains header validation, but
+<code>run_once()</code> doesn’t check the header.</p>
+<p>I wrote a simple function in the test module to prepend the
+header:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">prepend_header</span>(<span class="keyword">mut</span> b: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;) <span class="punctuation">-&gt;</span> <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">prepension</span> = <span class="built_in">vec!</span>[];</span><br><span class="line">    <span class="keyword">for</span> <span class="variable">byte</span> <span class="keyword">in</span> PIE_HEADER_PREFIX.<span class="title function_ invoke__">into_iter</span>() &#123;</span><br><span class="line">        prepension.<span class="title function_ invoke__">push</span>(byte.<span class="title function_ invoke__">clone</span>());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> prepension.<span class="title function_ invoke__">len</span>() &lt;= PIE_HEADER_LENGTH &#123;</span><br><span class="line">        prepension.<span class="title function_ invoke__">push</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    prepension.<span class="title function_ invoke__">append</span>(&amp;<span class="keyword">mut</span> b);</span><br><span class="line">    prepension</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_mul_opcode</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">test_vm</span> = VM::<span class="title function_ invoke__">get_test_vm</span>();</span><br><span class="line">    test_vm.program = <span class="built_in">vec!</span>[<span class="number">3</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>];</span><br><span class="line">    test_vm.program = <span class="title function_ invoke__">prepend_header</span>(test_vm.program);</span><br><span class="line">    test_vm.<span class="title function_ invoke__">run</span>();</span><br><span class="line">    <span class="built_in">assert_eq!</span>(test_vm.registers[<span class="number">2</span>], <span class="number">50</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="end">End</h2>
+<p>I think we’re ready for the two-pass workflow, so we’ll start on that
+next section!</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/15/">https://animenzzzzzz.github.io/pages/build-your-own-vm/15/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/14/" title="Symbol Tables"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Symbol Tables</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/16/" title="String Constants And More"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">String Constants And More</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/03/" title="More Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">More Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#cli-improvements"><span class="toc-number">1.</span> <span class="toc-text">CLI Improvements</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#add-the-dependency"><span class="toc-number">2.</span> <span class="toc-text">Add the Dependency</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#using-clap"><span class="toc-number">2.1.</span> <span class="toc-text">Using clap</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cli.yml"><span class="toc-number">2.2.</span> <span class="toc-text">cli.yml</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#makefile"><span class="toc-number">3.</span> <span class="toc-text">Makefile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#epie-header"><span class="toc-number">4.</span> <span class="toc-text">EPIE Header</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#the-vm"><span class="toc-number">5.</span> <span class="toc-text">The VM</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#broken-tests"><span class="toc-number">5.1.</span> <span class="toc-text">Broken Tests</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#end"><span class="toc-number">6.</span> <span class="toc-text">End</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

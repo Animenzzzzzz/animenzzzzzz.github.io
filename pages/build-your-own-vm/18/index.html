@@ -1,0 +1,396 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>PIDs | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Intro Hey everyone! In this tutorial, we’ll add PID tracking to the Iridium VM. Please ensure you are starting from https:&#x2F;&#x2F;gitlab.com&#x2F;subnetzero&#x2F;iridium&#x2F;tags&#x2F;0.0.17. &#x3D;&#x3D; PIDs There are two componen">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PIDs">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/18/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="Intro Hey everyone! In this tutorial, we’ll add PID tracking to the Iridium VM. Please ensure you are starting from https:&#x2F;&#x2F;gitlab.com&#x2F;subnetzero&#x2F;iridium&#x2F;tags&#x2F;0.0.17. &#x3D;&#x3D; PIDs There are two componen">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2024-12-30T09:21:48.000Z">
+<meta property="article:modified_time" content="2024-12-31T07:47:44.509Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/18/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'PIDs',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-12-31 15:47:44'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">PIDs</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-30T09:21:48.000Z" title="发表于 2024-12-30 17:21:48">2024-12-30</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T07:47:44.509Z" title="更新于 2024-12-31 15:47:44">2024-12-31</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="PIDs"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="intro">Intro</h2>
+<p>Hey everyone! In this tutorial, we’ll add PID tracking to the Iridium
+VM. Please ensure you are starting from <a
+target="_blank" rel="noopener" href="https://gitlab.com/subnetzero/iridium/tags/0.0.17">https://gitlab.com/subnetzero/iridium/tags/0.0.17</a>.
+== PIDs There are two components we need to unique identify:</p>
+<ol type="1">
+<li>Iridium VMs</li>
+<li>Processes run by those VMs</li>
+</ol>
+<p>This does bring up a more fundamental question, though. Is a VM
+long-lived, or short-lived? Should we create a VM, with its own
+registers and heap, for every application we want to run? Should we
+create a pool of VMs, each in their own threads, waiting to run any
+application we care to load?</p>
+<blockquote>
+<p>There are security considerations with re-using VMs. If we do that,
+we have to make sure we zero out the registers and heap before allowing
+another application access to it. Otherwise, applications could read
+data from previous VMs.</p>
+</blockquote>
+<h2 id="identifiers-for-iridium-vms">Identifiers for Iridium VMs</h2>
+<p>For this, we’re going to use a random UUID. On creation, a VM will
+generate a random identifier for itself. This will work regardless of
+what we end up doing about handling multiple VMs.</p>
+<p>For generating a random UUID, this crate is quite handy: <a
+target="_blank" rel="noopener" href="https://github.com/uuid-rs/uuid">https://github.com/uuid-rs/uuid</a>.
+Add it to your <code>Cargo.toml</code>, and don’t forget
+<code>extern crate uuid;</code> in <code>main.rs</code>.</p>
+<blockquote>
+<p>Because the UUIDs will be random ones, we need to enable the v4
+feature: <code>uuid = &#123; version = "0.7", features = ["v4"] &#125;</code>.</p>
+</blockquote>
+<p>Now over in <code>src/vm.rs</code>, let’s add a field to our VM:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Virtual machine struct that will execute bytecode</span></span><br><span class="line"><span class="meta">#[derive(Default, Clone)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">VM</span> &#123;</span><br><span class="line">    <span class="comment">/// Array that simulates having hardware registers</span></span><br><span class="line">    <span class="keyword">pub</span> registers: [<span class="type">i32</span>; <span class="number">32</span>],</span><br><span class="line">    <span class="comment">/// Program counter that tracks which byte is being executed</span></span><br><span class="line">    pc: <span class="type">usize</span>,</span><br><span class="line">    <span class="comment">/// The bytecode of the program being run</span></span><br><span class="line">    <span class="keyword">pub</span> program: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;,</span><br><span class="line">    <span class="comment">/// Used for heap memory</span></span><br><span class="line">    heap: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;,</span><br><span class="line">    <span class="comment">/// Contains the remainder of modulo division ops</span></span><br><span class="line">    remainder: <span class="type">usize</span>,</span><br><span class="line">    <span class="comment">/// Contains the result of the last comparison operation</span></span><br><span class="line">    equal_flag: <span class="type">bool</span>,</span><br><span class="line">    <span class="comment">/// Contains the read-only section data</span></span><br><span class="line">    ro_data: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;,</span><br><span class="line">    <span class="comment">/// Is a unique, randomly generated UUID for identifying this VM</span></span><br><span class="line">    id: Uuid,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And our builder function in <code>impl VM</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Creates and returns a new VM</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>() <span class="punctuation">-&gt;</span> VM &#123;</span><br><span class="line">    VM &#123;</span><br><span class="line">        registers: [<span class="number">0</span>; <span class="number">32</span>],</span><br><span class="line">        program: <span class="built_in">vec!</span>[],</span><br><span class="line">        ro_data: <span class="built_in">vec!</span>[],</span><br><span class="line">        heap: <span class="built_in">vec!</span>[],</span><br><span class="line">        pc: <span class="number">0</span>,</span><br><span class="line">        remainder: <span class="number">0</span>,</span><br><span class="line">        equal_flag: <span class="literal">false</span>,</span><br><span class="line">        id: Uuid::<span class="title function_ invoke__">new_v4</span>()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>(I’m not going to write a test for it, since it is impossible to
+fail)</p>
+<h2 id="processes">Processes</h2>
+<p>What we want is really just an event log: "Application X was run at
+<code>&lt;timestamp&gt;</code> and terminated at
+<code>&lt;timestamp&gt;</code> with an exit code of
+<code>&lt;code&gt;</code>".</p>
+<p>In theory, it is possible that a long running VM could re-use IDs,
+which could be confusing. Let’s give each application a random UUID as
+well.</p>
+<p>Head back to <code>vm.rs</code> and add in this:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> chrono::prelude::*;</span><br><span class="line"></span><br><span class="line"><span class="meta">#[derive(Clone, Debug)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">enum</span> <span class="title class_">VMEventType</span> &#123;</span><br><span class="line">    Start,</span><br><span class="line">    GracefulStop,</span><br><span class="line">    Crash</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#[derive(Clone, Debug)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">VMEvent</span> &#123;</span><br><span class="line">    event: VMEventType,</span><br><span class="line">    at: DateTime&lt;Utc&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Note the use of the chrono package: <a
+target="_blank" rel="noopener" href="https://github.com/chronotope/chrono">https://github.com/chronotope/chrono</a>.
+This is so we can easily use dates and times.</p>
+<blockquote>
+<p>And yes, all times are going to be in UTC. I am scowling right now at
+everyone who uses timezones in logs.</p>
+</blockquote>
+<p>Add the chrono package to your <code>Cargo.toml</code> and all the
+rest.</p>
+<h2 id="tracking-events">Tracking Events</h2>
+<p>For now, we’ll give the VM a list of VMEvents that we’ll keep
+appending to.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Virtual machine struct that will execute bytecode</span></span><br><span class="line"><span class="meta">#[derive(Default, Clone)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">VM</span> &#123;</span><br><span class="line">    <span class="comment">// I&#x27;m removing the other fields as we have already seen them</span></span><br><span class="line">    events: <span class="type">Vec</span>&lt;VMEvent&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>and…​</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>() <span class="punctuation">-&gt;</span> VM &#123;</span><br><span class="line">    VM &#123;</span><br><span class="line">        <span class="comment">// I&#x27;m removing the other fields as we have already seen them</span></span><br><span class="line">        events: <span class="type">Vec</span>::<span class="title function_ invoke__">new</span>()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="almost-there">Almost There!</h2>
+<p>Let’s modify the VM to add an event when the <code>run()</code>
+function starts, stops, or crashes:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Wraps execution in a loop so it will continue to run until done or there is an error</span></span><br><span class="line"><span class="comment">/// executing instructions.</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">u32</span> &#123;</span><br><span class="line">    <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(VMEvent&#123;event: VMEventType::Start, at: Utc::<span class="title function_ invoke__">now</span>()&#125;);</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Should setup custom errors here</span></span><br><span class="line">    <span class="keyword">if</span> !<span class="keyword">self</span>.<span class="title function_ invoke__">verify_header</span>() &#123;</span><br><span class="line">        <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(VMEvent&#123;event: VMEventType::Crash, at: Utc::<span class="title function_ invoke__">now</span>()&#125;);</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Header was incorrect&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// If the header is valid, we need to change the PC to be at bit 65.</span></span><br><span class="line">    <span class="keyword">self</span>.pc = <span class="number">64</span>;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">is_done</span> = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">while</span> !is_done &#123;</span><br><span class="line">        is_done = <span class="keyword">self</span>.<span class="title function_ invoke__">execute_instruction</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(VMEvent&#123;event: VMEventType::Stop, at: Utc::<span class="title function_ invoke__">now</span>()&#125;);</span><br><span class="line">    <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Note that we are assuming the application terminated gracefully as
+long as the while loop ends. This is because
+<code>execute_instruction</code> returns a bool, not an integer.
+Sigh.</p>
+<p>Let’s change it. It will be a little painful, but it will be much
+more painful later.</p>
+<p>First, we have to change the return value:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">execute_instruction</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">u32</span></span><br></pre></td></tr></table></figure>
+<p>Then in the check if the pc has exceeded the program length:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">self</span>.pc &gt;= <span class="keyword">self</span>.program.<span class="title function_ invoke__">len</span>() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>For the HLT and IGL codes:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Opcode::HLT =&gt; &#123;</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;HLT encountered&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">Opcode::IGL =&gt; &#123;</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;Illegal instruction encountered&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>and the very last line, where we returned false when an opcode
+returned or the application is done:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">execute_instruction</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">u32</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">self</span>.pc &gt;= <span class="keyword">self</span>.program.<span class="title function_ invoke__">len</span>() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">match</span> <span class="keyword">self</span>.<span class="title function_ invoke__">decode_opcode</span>() &#123;</span><br><span class="line">        Opcode::LOAD =&gt; &#123;</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">register</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>;</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">number</span> = <span class="type">u32</span>::<span class="title function_ invoke__">from</span>(<span class="keyword">self</span>.<span class="title function_ invoke__">next_16_bits</span>());</span><br><span class="line">            <span class="keyword">self</span>.registers[register] = number <span class="keyword">as</span> <span class="type">i32</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// &lt;snip a lot of other opcodes</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And now we go to change the run function yet again:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">u32</span> &#123;</span><br><span class="line">    <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(VMEvent&#123;event: VMEventType::Start, at: Utc::<span class="title function_ invoke__">now</span>()&#125;);</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Should setup custom errors here</span></span><br><span class="line">    <span class="keyword">if</span> !<span class="keyword">self</span>.<span class="title function_ invoke__">verify_header</span>() &#123;</span><br><span class="line">        <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(VMEvent&#123;event: VMEventType::Crash&#123;code: <span class="number">1</span>&#125;, at: Utc::<span class="title function_ invoke__">now</span>()&#125;);</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Header was incorrect&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// If the header is valid, we need to change the PC to be at bit 65.</span></span><br><span class="line">    <span class="keyword">self</span>.pc = <span class="number">64</span>;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">is_done</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> is_done == <span class="number">0</span> &#123;</span><br><span class="line">        is_done = <span class="keyword">self</span>.<span class="title function_ invoke__">execute_instruction</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(VMEvent&#123;event: VMEventType::GracefulStop&#123;code: is_done&#125;, at: Utc::<span class="title function_ invoke__">now</span>()&#125;);</span><br><span class="line">    <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Crap. The problem is that we are retreating a return code of 0 as a
+signal that the application is done, but right now, some instructions
+(e.g., HLT), return a 0. So the program will continue, even when it
+shouldn’t.</p>
+<p>Does this mean that HLT should return something &gt; 0? To be honest,
+I don’t know. I do know I don’t want to break from the *nix convention
+of 0 == ok, and &gt; 0 is an error of some sort…​</p>
+<p>Oh, hrm, Rust has the wonderful Option&lt;_&gt;…​hehe…​option. Let’s
+try using an Option with nothing in it as the signal to keep
+executing.</p>
+<blockquote>
+<p>I’m writing this as I write the code, so you can see my thought
+process.</p>
+</blockquote>
+<p>Let’s try this as the run function in <code>vm.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Wraps execution in a loop so it will continue to run until done or there is an error</span></span><br><span class="line"><span class="comment">/// executing instructions.</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">u32</span> &#123;</span><br><span class="line">    <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(VMEvent&#123;event: VMEventType::Start, at: Utc::<span class="title function_ invoke__">now</span>()&#125;);</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Should setup custom errors here</span></span><br><span class="line">    <span class="keyword">if</span> !<span class="keyword">self</span>.<span class="title function_ invoke__">verify_header</span>() &#123;</span><br><span class="line">        <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(VMEvent&#123;event: VMEventType::Crash&#123;code: <span class="number">1</span>&#125;, at: Utc::<span class="title function_ invoke__">now</span>()&#125;);</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Header was incorrect&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// If the header is valid, we need to change the PC to be at bit 65.</span></span><br><span class="line">    <span class="keyword">self</span>.pc = <span class="number">64</span>;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">is_done</span> = <span class="literal">None</span>;</span><br><span class="line">    <span class="keyword">while</span> is_done.<span class="title function_ invoke__">is_none</span>() &#123;</span><br><span class="line">        is_done = <span class="keyword">self</span>.<span class="title function_ invoke__">execute_instruction</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(VMEvent&#123;event: VMEventType::GracefulStop&#123;code: is_done.<span class="title function_ invoke__">unwrap</span>()&#125;, at: Utc::<span class="title function_ invoke__">now</span>()&#125;);</span><br><span class="line">    <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Note we have to unwrap <code>is_done</code> in adding the stop event.
+And then in the <code>execute_instruction</code> function:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">execute_instruction</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">Option</span>&lt;<span class="type">u32</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">self</span>.pc &gt;= <span class="keyword">self</span>.program.<span class="title function_ invoke__">len</span>() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_ invoke__">Some</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Note the change of return type of the signature as well, and don’t
+forget to fix the HLT and IGL opcodes. And at last, the end of our
+<code>run</code> function:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">u32</span> &#123;</span><br><span class="line">    <span class="comment">// &lt;snip&gt;</span></span><br><span class="line">    <span class="literal">None</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Run <code>cargo test</code> to make sure we didn’t break
+anything…​</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">test result: ok. 44 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out</span><br></pre></td></tr></table></figure>
+<p>Yay!</p>
+<h2 id="application-id">Application ID</h2>
+<p>For now, let’s just use a new VM per application run. This makes the
+VM ID the same as the Application ID. We may want to think about
+building a slightly more abstract form of a program, so we can attach
+additional information to it.</p>
+<h3 id="update-vmevent">Update VMEvent</h3>
+<p>Let’s update VMEvent to have an id field:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Clone, Debug)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">VMEvent</span> &#123;</span><br><span class="line">    event: VMEventType,</span><br><span class="line">    at: DateTime&lt;Utc&gt;,</span><br><span class="line">    application_id: Uuid</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And then in each of the three places we generate an event, clone it
+from the VM id. Our run function should look like this now:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Wraps execution in a loop so it will continue to run until done or there is an error</span></span><br><span class="line"><span class="comment">/// executing instructions.</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">u32</span> &#123;</span><br><span class="line">    <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(</span><br><span class="line">        VMEvent&#123;</span><br><span class="line">            event: VMEventType::Start,</span><br><span class="line">            at: Utc::<span class="title function_ invoke__">now</span>(),</span><br><span class="line">            application_id: <span class="keyword">self</span>.id.<span class="title function_ invoke__">clone</span>()</span><br><span class="line">        &#125;</span><br><span class="line">    );</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Should setup custom errors here</span></span><br><span class="line">    <span class="keyword">if</span> !<span class="keyword">self</span>.<span class="title function_ invoke__">verify_header</span>() &#123;</span><br><span class="line">        <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(</span><br><span class="line">            VMEvent&#123;</span><br><span class="line">                event: VMEventType::Crash&#123;</span><br><span class="line">                    code: <span class="number">1</span></span><br><span class="line">                &#125;,</span><br><span class="line">                at: Utc::<span class="title function_ invoke__">now</span>(),</span><br><span class="line">                application_id: <span class="keyword">self</span>.id.<span class="title function_ invoke__">clone</span>()</span><br><span class="line">            &#125;</span><br><span class="line">        );</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Header was incorrect&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// If the header is valid, we need to change the PC to be at bit 65.</span></span><br><span class="line">    <span class="keyword">self</span>.pc = <span class="number">64</span>;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">is_done</span> = <span class="literal">None</span>;</span><br><span class="line">    <span class="keyword">while</span> is_done.<span class="title function_ invoke__">is_none</span>() &#123;</span><br><span class="line">        is_done = <span class="keyword">self</span>.<span class="title function_ invoke__">execute_instruction</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(</span><br><span class="line">        VMEvent&#123;</span><br><span class="line">            event: VMEventType::GracefulStop&#123;</span><br><span class="line">                code: is_done.<span class="title function_ invoke__">unwrap</span>()&#125;,</span><br><span class="line">                at: Utc::<span class="title function_ invoke__">now</span>(),</span><br><span class="line">                application_id: <span class="keyword">self</span>.id.<span class="title function_ invoke__">clone</span>()</span><br><span class="line">        &#125;</span><br><span class="line">    );</span><br><span class="line">    <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And…​damnit! We’re returning 1 or 0 from the <code>run</code> function
+still. So our nice collection of events vanish.</p>
+<p>Sigh. OK, let’s change the <code>run</code> function to return a list
+of our events, and we’ll change the 1 and 0 returns to return our entire
+Vector of events. The final run function should look like:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">Vec</span>&lt;VMEvent&gt; &#123;</span><br><span class="line">    <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(</span><br><span class="line">        VMEvent&#123;</span><br><span class="line">            event: VMEventType::Start,</span><br><span class="line">            at: Utc::<span class="title function_ invoke__">now</span>(),</span><br><span class="line">            application_id: <span class="keyword">self</span>.id.<span class="title function_ invoke__">clone</span>()</span><br><span class="line">        &#125;</span><br><span class="line">    );</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Should setup custom errors here</span></span><br><span class="line">    <span class="keyword">if</span> !<span class="keyword">self</span>.<span class="title function_ invoke__">verify_header</span>() &#123;</span><br><span class="line">        <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(</span><br><span class="line">            VMEvent&#123;</span><br><span class="line">                event: VMEventType::Crash&#123;</span><br><span class="line">                    code: <span class="number">1</span></span><br><span class="line">                &#125;,</span><br><span class="line">                at: Utc::<span class="title function_ invoke__">now</span>(),</span><br><span class="line">                application_id: <span class="keyword">self</span>.id.<span class="title function_ invoke__">clone</span>()</span><br><span class="line">            &#125;</span><br><span class="line">        );</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Header was incorrect&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">self</span>.events.<span class="title function_ invoke__">clone</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// If the header is valid, we need to change the PC to be at bit 65.</span></span><br><span class="line">    <span class="keyword">self</span>.pc = <span class="number">64</span>;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">is_done</span> = <span class="literal">None</span>;</span><br><span class="line">    <span class="keyword">while</span> is_done.<span class="title function_ invoke__">is_none</span>() &#123;</span><br><span class="line">        is_done = <span class="keyword">self</span>.<span class="title function_ invoke__">execute_instruction</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">self</span>.events.<span class="title function_ invoke__">push</span>(</span><br><span class="line">        VMEvent&#123;</span><br><span class="line">            event: VMEventType::GracefulStop&#123;</span><br><span class="line">                code: is_done.<span class="title function_ invoke__">unwrap</span>()&#125;,</span><br><span class="line">                at: Utc::<span class="title function_ invoke__">now</span>(),</span><br><span class="line">                application_id: <span class="keyword">self</span>.id.<span class="title function_ invoke__">clone</span>()</span><br><span class="line">        &#125;</span><br><span class="line">    );</span><br><span class="line">    <span class="keyword">self</span>.events.<span class="title function_ invoke__">clone</span>()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>cargo test</code> and:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">error[E0308]: mismatched types</span><br><span class="line">  --&gt; src/scheduler/mod.rs:21:7</span><br><span class="line">   |</span><br><span class="line">20 |       pub fn get_thread(&amp;mut self, mut vm: VM) -&gt; thread::JoinHandle&lt;u32&gt; &#123;</span><br><span class="line">   |                                                   ----------------------- expected `std::thread::JoinHandle&lt;u32&gt;` because of return type</span><br><span class="line">21 | /       thread::spawn(move || &#123;</span><br><span class="line">22 | |           vm.run()</span><br><span class="line">23 | |       &#125;)</span><br><span class="line">   | |________^ expected u32, found struct `std::vec::Vec`</span><br><span class="line">   |</span><br><span class="line">   = note: expected type `std::thread::JoinHandle&lt;u32&gt;`</span><br><span class="line">              found type `std::thread::JoinHandle&lt;std::vec::Vec&lt;vm::VMEvent&gt;&gt;`</span><br></pre></td></tr></table></figure>
+<p>Fine, compiler. Off we go to <code>src/scheduler/mod.rs</code>. Add
+an import:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> vm::&#123;VM, VMEvent&#125;;</span><br></pre></td></tr></table></figure>
+<p>And change the signature of <code>get_thread</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Takes a VM and runs it in a background thread</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">get_thread</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, <span class="keyword">mut</span> vm: VM) <span class="punctuation">-&gt;</span> thread::JoinHandle&lt;<span class="type">Vec</span>&lt;VMEvent&gt;&gt; &#123;</span><br><span class="line">  thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;</span><br><span class="line">      vm.<span class="title function_ invoke__">run</span>()</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>cargo test</code> says everything is fine, the compiler isn’t
+yelling at us…​are we done?</p>
+<p>Ha. No, of course not! We still aren’t displaying the results to the
+users.</p>
+<h3 id="hackety-hack">Hackety Hack</h3>
+<p>For now, we’re just going to print out the event log when we call
+run. We have to do this in two places:</p>
+<ol type="1">
+<li>When the user runs a program from the CLI, e.g.,
+<code>iridium myfile.iasm</code></li>
+<li>When the user runs a program via the REPL</li>
+</ol>
+<p>We’ll format it later so that it looks nicer, but this post is
+already at 2033 words.</p>
+<p>Let’s tackle them in sequence.</p>
+<h3 id="cli">CLI</h3>
+<p>In <code>main.rs</code>, we have this section:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="variable">program</span> = asm.<span class="title function_ invoke__">assemble</span>(&amp;program);</span><br><span class="line"><span class="keyword">match</span> program &#123;</span><br><span class="line">    <span class="title function_ invoke__">Ok</span>(p) =&gt; &#123;</span><br><span class="line">        vm.<span class="title function_ invoke__">add_bytes</span>(p);</span><br><span class="line">        vm.<span class="title function_ invoke__">run</span>();</span><br><span class="line">        std::process::<span class="title function_ invoke__">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="title function_ invoke__">Err</span>(_e) =&gt; &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Let’s assign the out of <code>run</code> to a variable, and then
+debug print it:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">match</span> program &#123;</span><br><span class="line">    <span class="title function_ invoke__">Ok</span>(p) =&gt; &#123;</span><br><span class="line">        vm.<span class="title function_ invoke__">add_bytes</span>(p);</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">events</span> = vm.<span class="title function_ invoke__">run</span>();</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;VM Events&quot;</span>);</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;--------------------------&quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> <span class="variable">event</span> <span class="keyword">in</span> &amp;events &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;&#123;:#?&#125;&quot;</span>, event);</span><br><span class="line">        &#125;;</span><br><span class="line">        std::process::<span class="title function_ invoke__">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="title function_ invoke__">Err</span>(_e) =&gt; &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="repl">REPL</h3>
+<p>I’ll leave getting it to display in the REPL to you. You can see mine
+in <a
+target="_blank" rel="noopener" href="https://gitlab.com/subnetzero/iridium/-/tags/0.0.18">GitLab</a>.</p>
+<h2 id="end">End</h2>
+<p>We’ll end here for this one, though I want to make one
+observation.</p>
+<h3 id="coding-style">Coding Style</h3>
+<p>My coding style in Rust is oddly freeform for such a strict language.
+When writing Rust code, my goal in life becomes to appease the compiler.
+As long as I can do that, what I code usually works like I think it
+will.</p>
+<p>See you next tutorial!</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/18/">https://animenzzzzzz.github.io/pages/build-your-own-vm/18/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/17/" title="Basic Threads"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Basic Threads</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/19/" title="Starting on Palladium"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Starting on Palladium</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/03/" title="More Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">More Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#intro"><span class="toc-number">1.</span> <span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#identifiers-for-iridium-vms"><span class="toc-number">2.</span> <span class="toc-text">Identifiers for Iridium VMs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#processes"><span class="toc-number">3.</span> <span class="toc-text">Processes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tracking-events"><span class="toc-number">4.</span> <span class="toc-text">Tracking Events</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#almost-there"><span class="toc-number">5.</span> <span class="toc-text">Almost There!</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#application-id"><span class="toc-number">6.</span> <span class="toc-text">Application ID</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#update-vmevent"><span class="toc-number">6.1.</span> <span class="toc-text">Update VMEvent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hackety-hack"><span class="toc-number">6.2.</span> <span class="toc-text">Hackety Hack</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cli"><span class="toc-number">6.3.</span> <span class="toc-text">CLI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#repl"><span class="toc-number">6.4.</span> <span class="toc-text">REPL</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#end"><span class="toc-number">7.</span> <span class="toc-text">End</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#coding-style"><span class="toc-number">7.1.</span> <span class="toc-text">Coding Style</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

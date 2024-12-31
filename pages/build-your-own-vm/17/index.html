@@ -1,0 +1,442 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Basic Threads | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Intro Hey everyone! In this tutorial, we’re going to start adding in multithreading to the Iridium VM. Please make sure you are starting from this point in the code: https:&#x2F;&#x2F;gitlab.com&#x2F;subnetzero&#x2F;i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Basic Threads">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/17/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="Intro Hey everyone! In this tutorial, we’re going to start adding in multithreading to the Iridium VM. Please make sure you are starting from this point in the code: https:&#x2F;&#x2F;gitlab.com&#x2F;subnetzero&#x2F;i">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2024-12-30T05:39:18.000Z">
+<meta property="article:modified_time" content="2024-12-30T09:12:48.103Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/17/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Basic Threads',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-12-30 17:12:48'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Basic Threads</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-30T05:39:18.000Z" title="发表于 2024-12-30 13:39:18">2024-12-30</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-30T09:12:48.103Z" title="更新于 2024-12-30 17:12:48">2024-12-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Basic Threads"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="intro">Intro</h2>
+<p>Hey everyone! In this tutorial, we’re going to start adding in
+multithreading to the Iridium VM. Please make sure you are starting from
+this point in the code: <a
+target="_blank" rel="noopener" href="https://gitlab.com/subnetzero/iridium/tags/0.0.16">https://gitlab.com/subnetzero/iridium/tags/0.0.16</a>.
+Going forward, I’m going to make a tag per tutorial so that everyone
+starts from a common point. === A Note on Assumed Knowledge I write
+these tutorials target towards more advanced users. I sometimes skip
+small steps, such as "add in this line to file X".</p>
+<h2 id="multithreading">Multithreading</h2>
+<p>The current version of Iridium is single-process, single-threaded.
+When you execute an application, the VM can’t do anything else until it
+has finished. This is how the VMs for languages like Python and Ruby
+work. We want Iridium to work more like the BEAM VM, which provides a
+sort of shell to the VM. It can see running processes, terminate them,
+or other administrative tasks.</p>
+<p>This will take a lot more than one tutorial part, of course. =) But a
+good first step would be able to use the REPL to run a program in a
+separate OS thread.</p>
+<p>Ready? Here we go!</p>
+<h3 id="threads">Threads</h3>
+<p>We should probably figure out how to create threads in Rust first.
+The Rust book covers them well, so I’ll steal an example from it:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> std::thread;</span><br><span class="line"><span class="keyword">use</span> std::time::Duration;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    thread::<span class="title function_ invoke__">spawn</span>(|| &#123;</span><br><span class="line">        <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="number">1</span>..<span class="number">10</span> &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;hi number &#123;&#125; from the spawned thread!&quot;</span>, i);</span><br><span class="line">            thread::<span class="title function_ invoke__">sleep</span>(Duration::<span class="title function_ invoke__">from_millis</span>(<span class="number">1</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="number">1</span>..<span class="number">5</span> &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;hi number &#123;&#125; from the main thread!&quot;</span>, i);</span><br><span class="line">        thread::<span class="title function_ invoke__">sleep</span>(Duration::<span class="title function_ invoke__">from_millis</span>(<span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Can we add a REPL command that accepts a path to a file of assembly
+code, compiles it, and hands it off to a VM in a background thread?
+Could it be that simple?! Let’s find out!</p>
+<h3 id="repl-flow">REPL Flow</h3>
+<p>We should probably put a bit of thought into the details of this
+before charging ahead. A slightly more boring path, but our users will
+thank us.</p>
+<p><em>Maybe.</em></p>
+<p>OK, probably not.</p>
+<p>Anyway, here is a possible workflow:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Welcome to Iridium! Let&#x27;s be productive!</span><br><span class="line">&gt;&gt;&gt; .spawn</span><br><span class="line">Please enter the path to the file you wish to load: test.iasm</span><br><span class="line">Starting program in background thread</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<p>Questions arise when thinking about this:</p>
+<ol type="1">
+<li>How do we get the output from the program?</li>
+<li>How do we display the output from the program to the user?</li>
+<li>Do we need to track all programs run in the background?</li>
+<li>How will we allow those programs to get input?</li>
+</ol>
+<p>I’m sure we could think of more, but let’s address the issue of
+tracking programs.</p>
+<h3 id="auditability-and-pids">Auditability and PIDs</h3>
+<p>Whenever you execute a program on a computer running Linux, the
+operating system gives it something called a <code>PID</code> or process
+identifier. Linux guarantees that a PID is unique amongst currently
+running processes, non-negative, and between 1 and 32,767. After it
+reaches that number, it will begin to wrap around. If a process starts,
+gets a PID of 600, runs, then stops, 600 can be re-used.</p>
+<blockquote>
+<p>Why that oddly specific upper bound? Because that’s the default in
+most Linux kernels. As computing needs and power have grown, the idea of
+a server running over 32k processes is no longer as absurd as it once
+was. To accommodate this, you can change the max PID to around four
+million.</p>
+</blockquote>
+<p>When we start a REPL session, that is seen as <strong>one
+process</strong>. We can start OS threads in the background, but the OS
+does not know anything specific about what the Iridium VM is doing. If
+we want to track what code the VM runs and the results, we’ll have to do
+the same.</p>
+<h2 id="a-slight-digression">A Slight Digression</h2>
+<p>As I was poking around with 0.0.16, this happened:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; .load_file</span><br><span class="line">Please enter the path to the file you wish to load:</span><br><span class="line">Attempting to load program from file...</span><br><span class="line">thread &#x27;main&#x27; panicked at &#x27;File not found: Os &#123; code: 2, kind: NotFound, message: &quot;No such file or directory&quot; &#125;&#x27;, libcore/result.rs:945:5</span><br></pre></td></tr></table></figure>
+<p>It seems the REPL crashes when it can’t find a file. We’re going to
+fix that real quick.</p>
+<blockquote>
+<p>Since we are getting into new territory for me, we’ll probably have a
+lot of these little side quests going forward. =)</p>
+</blockquote>
+<p>The troublesome line is this one in <code>src/repl/mod.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">f</span> = File::<span class="title function_ invoke__">open</span>(Path::<span class="title function_ invoke__">new</span>(&amp;filename)).<span class="title function_ invoke__">expect</span>(<span class="string">&quot;File not found&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>Let’s change it to handle the error case without panicking:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="variable">filename</span> = Path::<span class="title function_ invoke__">new</span>(&amp;tmp);</span><br><span class="line"><span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">f</span> = <span class="keyword">match</span> File::<span class="title function_ invoke__">open</span>(&amp;filename) &#123;</span><br><span class="line">    <span class="title function_ invoke__">Ok</span>(f) =&gt; &#123; f &#125;</span><br><span class="line">    <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;There was an error opening that file: &#123;:?&#125;&quot;</span>, e);</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>We can also get rid of that double <code>Path::new()</code> call.</p>
+<h3 id="testing">Testing</h3>
+<p>After making that change, all tests still pass, and if we try to give
+it a non-existent or bad file name now, we get:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Welcome to Iridium! Let&#x27;s be productive!</span><br><span class="line">&gt;&gt;&gt; .load_file</span><br><span class="line">Please enter the path to the file you wish to load:</span><br><span class="line">Attempting to load program from file...</span><br><span class="line">There was an error opening that file: Os &#123; code: 2, kind: NotFound, message: &quot;No such file or directory&quot; &#125;</span><br><span class="line">&gt;&gt;&gt; .load_file</span><br><span class="line">Please enter the path to the file you wish to load: doh</span><br><span class="line">Attempting to load program from file...</span><br><span class="line">There was an error opening that file: Os &#123; code: 2, kind: NotFound, message: &quot;No such file or directory&quot; &#125;</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<p>Yay! Committing that, and we can go back to threading.</p>
+<h2 id="back-to-threading">Back to Threading</h2>
+<p>Let’s tackle the whole the spawning a thread thing first. Make a new
+module, <code>src/scheduler/mod.rs</code>. We’re using a new module
+because I suspect that this will be the beginnings of a more complex
+schedule we’ll use later. We can also use a <code>Scheduler</code>
+struct to track information, such as PIDs.</p>
+<p>In the new module, put the following:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> std::thread;</span><br><span class="line"><span class="keyword">use</span> vm::VM;</span><br><span class="line"></span><br><span class="line"><span class="meta">#[derive(Default)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">Scheduler</span> &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">Scheduler</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>() <span class="punctuation">-&gt;</span> Scheduler &#123;</span><br><span class="line">        Scheduler&#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">get_thread</span>(vm: VM) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="function-signature">Function Signature</h3>
+<p>Let’s look at the signature for the thread::spawn() function:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">spawn</span>&lt;F, T&gt;(f: F) <span class="punctuation">-&gt;</span> JoinHandle&lt;T&gt;</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">    F: <span class="title function_ invoke__">FnOnce</span>() <span class="punctuation">-&gt;</span> T,</span><br><span class="line">    F: <span class="built_in">Send</span> + <span class="symbol">&#x27;static</span>,</span><br><span class="line">    T: <span class="built_in">Send</span> + <span class="symbol">&#x27;static</span>,</span><br></pre></td></tr></table></figure>
+<p>I am going to go over every line; a few new advanced Rust concepts
+are introduced here.</p>
+<p>First off, notice that it is generic over F and T, and returns a
+<code>JoinHandle&lt;T&gt;</code>. What’s a
+<code>JoinHandle&lt;T&gt;</code> you ask? Great question! You can think
+of them as handles to the thread that is executing. It <strong>is
+not</strong> the thread itself, nor is it a simple pointer to it.
+Whatever the thread does, it has to return T.</p>
+<p>The type parameter <code>F</code> is a FnClose, or function closure.
+The <code>where</code> constraint here indicates what types of functions
+are allowed:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">where</span></span><br><span class="line">    F: <span class="title function_ invoke__">FnOnce</span>() <span class="punctuation">-&gt;</span> T,</span><br><span class="line">    F: <span class="built_in">Send</span> + <span class="symbol">&#x27;static</span>,</span><br><span class="line">    T: <span class="built_in">Send</span> + <span class="symbol">&#x27;static</span>,</span><br></pre></td></tr></table></figure>
+<p>They must implement <code>Send + 'static</code>, and
+<code>FnOnce() → T</code>. This means two things:</p>
+<ol type="1">
+<li>The function must return <code>T</code></li>
+<li><code>FnOnce</code> functions are called once (there are other types
+when needed, such as <code>Fn、FnMut</code>)</li>
+<li>Requiring <code>'static</code> means that it will exist for the life
+of the program. NOTE: This means the <em>closure</em>, not a specific
+execution of it.</li>
+</ol>
+<p>Here’s a simple example:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="variable">join_handle</span>: thread::JoinHandle&lt;<span class="type">u32</span>&gt; = thread::<span class="title function_ invoke__">spawn</span>(|| &#123;</span><br><span class="line">    <span class="number">10.0</span> <span class="comment">// This would fail, because it is a float, not a u32</span></span><br><span class="line">    <span class="number">10</span> <span class="comment">// This would succees, because it is a u32, not a float</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>In docs, you may see <code>JoinHandler&lt;T&gt;</code> written as
+<code>JoinHandler&lt;_&gt;</code>. The <code>_</code> is a placeholder
+and won’t compile (I don’t think, anyway).</p>
+</blockquote>
+<p>This means we have to change our <code>VM::run()</code> function to
+return a value. Easy-peasy:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Wraps execution in a loop so it will continue to run until done or there is an error</span></span><br><span class="line"><span class="comment">/// executing instructions.</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">u32</span> &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Should setup custom errors here</span></span><br><span class="line">    <span class="keyword">if</span> !<span class="keyword">self</span>.<span class="title function_ invoke__">verify_header</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Header was incorrect&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If the header is valid, we need to change the PC to be at bit 65.</span></span><br><span class="line">    <span class="keyword">self</span>.pc = <span class="number">65</span>;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">is_done</span> = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">while</span> !is_done &#123;</span><br><span class="line">        is_done = <span class="keyword">self</span>.<span class="title function_ invoke__">execute_instruction</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="threads-1">Threads</h3>
+<p>Back to the spawning pool, zergling!</p>
+<p>The actual thread code itself is simple: <code>vm.run()</code>.
+<code>get_thread</code> will accept a VM, create a thread, which will
+execute <code>vm.run()</code> until it returns a value. This is simple
+because we are giving the thread ownership of an entire <code>VM</code>,
+so borrowck remains pleased. As we make the scheduler more advanced,
+we’ll have to get a bit more creative. For now, this will work:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">impl</span> <span class="title class_">Scheduler</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>() <span class="punctuation">-&gt;</span> Scheduler &#123;</span><br><span class="line">        Scheduler&#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/// Takes a VM and runs it in a background thread</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">get_thread</span>(<span class="keyword">mut</span> vm: VM) <span class="punctuation">-&gt;</span> thread::JoinHandle&lt;<span class="type">u32</span>&gt; &#123;</span><br><span class="line">      thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;</span><br><span class="line">          vm.<span class="title function_ invoke__">run</span>()</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>For now, let’s copy the Linux model, and a assign each program a
+unique <code>PID</code> starting from 0 at zero. Let’s change our
+Scheduler structure like so:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">Scheduler</span> &#123;</span><br><span class="line">    next_pid: <span class="type">u32</span>,</span><br><span class="line">    max_pid: <span class="type">u32</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">Scheduler</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>() <span class="punctuation">-&gt;</span> Scheduler &#123;</span><br><span class="line">        Scheduler&#123;</span><br><span class="line">            next_pid: <span class="number">0</span>,</span><br><span class="line">            max_pid: <span class="number">50000</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="adding-scheduler-to-repl">Adding Scheduler to REPL</h2>
+<p>Much like we gave the <code>REPL</code> shell its own
+<code>VM</code>, we can give it a scheduler, like so:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> scheduler::Scheduler;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// Core structure for the REPL for the Assembler</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">REPL</span> &#123;</span><br><span class="line">    command_buffer: <span class="type">Vec</span>&lt;<span class="type">String</span>&gt;,</span><br><span class="line">    vm: VM,</span><br><span class="line">    asm: Assembler,</span><br><span class="line">    scheduler: Scheduler</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">REPL</span> &#123;</span><br><span class="line">    <span class="comment">/// Creates and returns a new assembly REPL</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>() <span class="punctuation">-&gt;</span> REPL &#123;</span><br><span class="line">        REPL &#123;</span><br><span class="line">            vm: VM::<span class="title function_ invoke__">new</span>(),</span><br><span class="line">            command_buffer: <span class="built_in">vec!</span>[],</span><br><span class="line">            asm: Assembler::<span class="title function_ invoke__">new</span>(),</span><br><span class="line">            scheduler: Scheduler::<span class="title function_ invoke__">new</span>()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>I’m not including the rest of the <code>REPL</code> functions again.
+You can scroll up for them. =)</p>
+<h3 id="assembler">Assembler</h3>
+<p>For now, we’ll still have the REPL handle assembling, and will give
+the thread a VM with bytecode ready to run.</p>
+<blockquote>
+<p>The ".spawn" and ".load_file" commands are nearly identical. Let’s
+factor those into smaller functions.</p>
+</blockquote>
+<h2 id="first-new-function">First New Function</h2>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">get_data_from_load</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">Option</span>&lt;<span class="type">String</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">stdin</span> = io::<span class="title function_ invoke__">stdin</span>();</span><br><span class="line">    <span class="built_in">print!</span>(<span class="string">&quot;Please enter the path to the file you wish to load: &quot;</span>);</span><br><span class="line">    io::<span class="title function_ invoke__">stdout</span>().<span class="title function_ invoke__">flush</span>().<span class="title function_ invoke__">expect</span>(<span class="string">&quot;Unable to flush stdout&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">tmp</span> = <span class="type">String</span>::<span class="title function_ invoke__">new</span>();</span><br><span class="line"></span><br><span class="line">    stdin.<span class="title function_ invoke__">read_line</span>(&amp;<span class="keyword">mut</span> tmp).<span class="title function_ invoke__">expect</span>(<span class="string">&quot;Unable to read line from user&quot;</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;Attempting to load program from file...&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">tmp</span> = tmp.<span class="title function_ invoke__">trim</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">filename</span> = Path::<span class="title function_ invoke__">new</span>(&amp;tmp);</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">f</span> = <span class="keyword">match</span> File::<span class="title function_ invoke__">open</span>(&amp;filename) &#123;</span><br><span class="line">        <span class="title function_ invoke__">Ok</span>(f) =&gt; &#123; f &#125;</span><br><span class="line">        <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;There was an error opening that file: &#123;:?&#125;&quot;</span>, e);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">contents</span> = <span class="type">String</span>::<span class="title function_ invoke__">new</span>();</span><br><span class="line">    <span class="keyword">match</span> f.<span class="title function_ invoke__">read_to_string</span>(&amp;<span class="keyword">mut</span> contents) &#123;</span><br><span class="line">        <span class="title function_ invoke__">Ok</span>(program_string) =&gt; &#123;</span><br><span class="line">            <span class="title function_ invoke__">Some</span>(program_string.<span class="title function_ invoke__">to_string</span>())</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;there was an error reading that file: &#123;:?&#125;&quot;</span>, e);</span><br><span class="line">            <span class="literal">None</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Put it in <code>repl/mod.rs</code> as part of the <code>REPL</code>
+impl. Now we can make <code>.spawn</code> and <code>.load_file</code>
+much smaller:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;.spawn&quot;</span> =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">contents</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">get_data_from_load</span>();</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Some</span>(contents) = contents &#123;</span><br><span class="line">        <span class="keyword">match</span> <span class="keyword">self</span>.asm.<span class="title function_ invoke__">assemble</span>(&amp;contents) &#123;</span><br><span class="line">            <span class="title function_ invoke__">Ok</span>(<span class="keyword">mut</span> assembled_program) =&gt; &#123;</span><br><span class="line">                <span class="built_in">println!</span>(<span class="string">&quot;Sending assembled program to VM&quot;</span>);</span><br><span class="line">                <span class="keyword">self</span>.vm.program.<span class="title function_ invoke__">append</span>(&amp;<span class="keyword">mut</span> assembled_program);</span><br><span class="line">                <span class="built_in">println!</span>(<span class="string">&quot;&#123;:#?&#125;&quot;</span>, <span class="keyword">self</span>.vm.program);</span><br><span class="line">                <span class="keyword">self</span>.scheduler.<span class="title function_ invoke__">get_thread</span>(<span class="keyword">self</span>.vm.<span class="title function_ invoke__">clone</span>());</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="title function_ invoke__">Err</span>(errors) =&gt; &#123;</span><br><span class="line">                <span class="keyword">for</span> <span class="variable">error</span> <span class="keyword">in</span> errors &#123;</span><br><span class="line">                    <span class="built_in">println!</span>(<span class="string">&quot;Unable to parse input: &#123;&#125;&quot;</span>, error);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="keyword">continue</span>; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="testing-1">Testing</h2>
+<p>We can start with a program but one instruction, HLT. You can find it
+under docs/examples/iasm. Let’s see what happens!</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; .spawn</span><br><span class="line">Please enter the path to the file you wish to load: /Users/fletcher/Projects/iridium-book/docs/examples/iasm/hlt.iasm</span><br><span class="line">Attempting to load program from file...</span><br><span class="line">There was an error parsing the code: Error(Code(CompleteStr(&quot;4&quot;), Many1))</span><br><span class="line">Unable to parse input: There was an error parsing the code: Error(Code(CompleteStr(&quot;4&quot;), Many1))</span><br></pre></td></tr></table></figure>
+<p>Doh. Time to debug.</p>
+<p><code>&lt;time passed&gt;</code></p>
+<p>Aha! You’ll notice in this section:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">match</span> f.<span class="title function_ invoke__">read_to_string</span>(&amp;<span class="keyword">mut</span> contents) &#123;</span><br><span class="line">    <span class="title function_ invoke__">Ok</span>(program_string) =&gt; &#123;</span><br><span class="line">        <span class="title function_ invoke__">Some</span>(program_string)</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;there was an error reading that file: &#123;:?&#125;&quot;</span>, e);</span><br><span class="line">        <span class="literal">None</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>read_to_string</code> returns the number of bytes it read, and
+reads the contents into the <code>String</code> provided as an argument.
+In our match statement, we converted that number of bytes into a string
+and returned. That is what the parser refused to parse.</p>
+<p>The fix is simple:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">match</span> f.<span class="title function_ invoke__">read_to_string</span>(&amp;<span class="keyword">mut</span> contents) &#123;</span><br><span class="line">    <span class="title function_ invoke__">Ok</span>(_bytes_read) =&gt; &#123;</span><br><span class="line">        <span class="title function_ invoke__">Some</span>(contents)</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;there was an error reading that file: &#123;:?&#125;&quot;</span>, e);</span><br><span class="line">        <span class="literal">None</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Let’s try again:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">Welcome to Iridium! Let&#x27;s be productive!</span><br><span class="line">&gt;&gt;&gt; .spawn</span><br><span class="line">Please enter the path to the file you wish to load: docs/examples/iasm/hlt.iasm</span><br><span class="line">Attempting to load program from file...</span><br><span class="line">Loaded conents: Some(</span><br><span class="line">    &quot;.data\n\n.code\nload $0 #100\nhlt\n&quot;</span><br><span class="line">)</span><br><span class="line">Did not find any errors in the first phase</span><br><span class="line">Sending assembled program to VM</span><br><span class="line">[</span><br><span class="line">    45,</span><br><span class="line">    50,</span><br><span class="line">    49,</span><br><span class="line">    45,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">  &lt;snip a ton of zeros&gt;</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    100,</span><br><span class="line">    5,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0</span><br><span class="line">]</span><br><span class="line">&gt;&gt;&gt; thread &#x27;&lt;unnamed&gt;&#x27; panicked at &#x27;index out of bounds: the len is 72 but the index is 72&#x27;, /Users/travis/build/rust-lang/rust/src/libcore/slice/mod.rs:2079:10</span><br><span class="line">note: Run with `RUST_BACKTRACE=1` for a backtrace.</span><br></pre></td></tr></table></figure>
+<p>After our assembler adds in the header and such, the final program
+size is going to be at least 65 bytes. 64 for the header, and 1 for at
+least the instruction. This looks like an off-by-one error in our
+program counter. That is, the program vector’s total length is 72, and
+it was off by one in the execution loop. I have a suspicion…​</p>
+<p>Check out the <code>run</code> function in <code>vm.rs</code>.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Wraps execution in a loop so it will continue to run until done or there is an error</span></span><br><span class="line"><span class="comment">/// executing instructions.</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">u32</span> &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Should setup custom errors here</span></span><br><span class="line">    <span class="keyword">if</span> !<span class="keyword">self</span>.<span class="title function_ invoke__">verify_header</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Header was incorrect&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// If the header is valid, we need to change the PC to be at bit 65.</span></span><br><span class="line">    <span class="keyword">self</span>.pc = <span class="number">64</span>;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">is_done</span> = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">while</span> !is_done &#123;</span><br><span class="line">        is_done = <span class="keyword">self</span>.<span class="title function_ invoke__">execute_instruction</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>See how it presets the program counter to 65? That means when the VM
+starts executing, the first thing it does is request the next
+instruction, which would be 66. The VM Is always ahead by one.</p>
+<p>Change that to 64 and let’s try again…​</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; .spawn</span><br><span class="line">Please enter the path to the file you wish to load: docs/examples/iasm/hlt.iasm</span><br><span class="line">Attempting to load program from file...</span><br><span class="line">Loaded conents: Some(</span><br><span class="line">    &quot;.data\n\n.code\nload $0 #100\nhlt\n&quot;</span><br><span class="line">)</span><br><span class="line">Did not find any errors in the first phase</span><br><span class="line">Sending assembled program to VM</span><br><span class="line">[</span><br><span class="line">    45,</span><br><span class="line">    50,</span><br><span class="line">    49,</span><br><span class="line">    45,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">  &lt;snip many zeros&gt;</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    100,</span><br><span class="line">    5,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0</span><br><span class="line">]</span><br><span class="line">&gt;&gt;&gt; HLT encountered</span><br></pre></td></tr></table></figure>
+<p>Hey, it ran and everything! In a background thread! Let’s check our
+registers to see if we can see the values:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">.registers</span><br><span class="line">Listing registers and all contents:</span><br><span class="line">[</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0,</span><br><span class="line">    0</span><br><span class="line">]</span><br><span class="line">End of Register Listing</span><br></pre></td></tr></table></figure>
+<h5 id="whaaa">Whaaa?</h5>
+<p>Because the VM ran in a background thread, it had its own set of
+registers and everything else. When we type <code>.registers</code> in
+the REPL, we’re still looking at the registers for the VM created and
+used by the REPL in the main thread.</p>
+<p>In the background thread, when <code>run</code> terminated, all those
+data structures were gone…​like tears in the rain.</p>
+<p>(Sorry not sorry)</p>
+<h2 id="a-surprise-failure">A Surprise Failure!</h2>
+<p>Imagine my surprise when I ran <code>cargo test</code> at this point
+and it showed four failed tests: test_sub_opcode, test_mul_opcode,
+test_div_opcode, test_add_opcode. The error was:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">failures:</span><br><span class="line"></span><br><span class="line">---- vm::tests::test_add_opcode stdout ----</span><br><span class="line">thread &#x27;vm::tests::test_add_opcode&#x27; panicked at &#x27;index out of bounds: the len is 69 but the index is 69&#x27;, /Users/travis/build/rust-lang/rust/src/libcore/slice/mod.rs:2079:10</span><br><span class="line">note: Run with `RUST_BACKTRACE=1` for a backtrace.</span><br><span class="line"></span><br><span class="line">---- vm::tests::test_div_opcode stdout ----</span><br><span class="line">thread &#x27;vm::tests::test_div_opcode&#x27; panicked at &#x27;index out of bounds: the len is 69 but the index is 69&#x27;, /Users/travis/build/rust-lang/rust/src/libcore/slice/mod.rs:2079:10</span><br><span class="line"></span><br><span class="line">---- vm::tests::test_load_opcode stdout ----</span><br><span class="line">Illegal instruction encountered</span><br><span class="line">thread &#x27;vm::tests::test_load_opcode&#x27; panicked at &#x27;assertion failed: `(left == right)`</span><br><span class="line">  left: `1`,</span><br><span class="line"> right: `500`&#x27;, src/vm.rs:336:9</span><br><span class="line"></span><br><span class="line">---- vm::tests::test_mul_opcode stdout ----</span><br><span class="line">thread &#x27;vm::tests::test_mul_opcode&#x27; panicked at &#x27;index out of bounds: the len is 69 but the index is 69&#x27;, /Users/travis/build/rust-lang/rust/src/libcore/slice/mod.rs:2079:10</span><br><span class="line"></span><br><span class="line">---- vm::tests::test_sub_opcode stdout ----</span><br><span class="line">thread &#x27;vm::tests::test_sub_opcode&#x27; panicked at &#x27;index out of bounds: the len is 69 but the index is 69&#x27;, /Users/travis/build/rust-lang/rust/src/libcore/slice/mod.rs:2079:10</span><br></pre></td></tr></table></figure>
+<p>Hello again, off by one error, my old friend. <em>We meet
+again!</em></p>
+<p>To fix it, I had to make a slight tweak to
+<code>prepend_header</code> in the <code>vm.rs</code> test module:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">prepend_header</span>(<span class="keyword">mut</span> b: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;) <span class="punctuation">-&gt;</span> <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">prepension</span> = <span class="built_in">vec!</span>[];</span><br><span class="line">    <span class="keyword">for</span> <span class="variable">byte</span> <span class="keyword">in</span> PIE_HEADER_PREFIX.<span class="title function_ invoke__">into_iter</span>() &#123;</span><br><span class="line">        prepension.<span class="title function_ invoke__">push</span>(byte.<span class="title function_ invoke__">clone</span>());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> prepension.<span class="title function_ invoke__">len</span>() &lt; PIE_HEADER_LENGTH &#123;</span><br><span class="line">        prepension.<span class="title function_ invoke__">push</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    prepension.<span class="title function_ invoke__">append</span>(&amp;<span class="keyword">mut</span> b);</span><br><span class="line">    prepension</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Can you spot the difference? =)</p>
+<h2 id="wrap-up">Wrap Up</h2>
+<p>We have found and fixed a few bugs and successfully have a primitive
+form of running applications in background threads that we can build on
+later. In the next section, we’ll finish up PID tracking.</p>
+<p>This is only the beginning of the cool features we’ll build into our
+VM. =) You can find the final form of the code after this tutorial in <a
+target="_blank" rel="noopener" href="https://gitlab.com/subnetzero/iridium">GitLab</a> under the tag
+0.0.17.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/17/">https://animenzzzzzz.github.io/pages/build-your-own-vm/17/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/16/" title="String Constants And More"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">String Constants And More</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/18/" title="PIDs"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">PIDs</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/03/" title="More Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">More Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#intro"><span class="toc-number">1.</span> <span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#multithreading"><span class="toc-number">2.</span> <span class="toc-text">Multithreading</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#threads"><span class="toc-number">2.1.</span> <span class="toc-text">Threads</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#repl-flow"><span class="toc-number">2.2.</span> <span class="toc-text">REPL Flow</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#auditability-and-pids"><span class="toc-number">2.3.</span> <span class="toc-text">Auditability and PIDs</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#a-slight-digression"><span class="toc-number">3.</span> <span class="toc-text">A Slight Digression</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#testing"><span class="toc-number">3.1.</span> <span class="toc-text">Testing</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#back-to-threading"><span class="toc-number">4.</span> <span class="toc-text">Back to Threading</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#function-signature"><span class="toc-number">4.1.</span> <span class="toc-text">Function Signature</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#threads-1"><span class="toc-number">4.2.</span> <span class="toc-text">Threads</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#adding-scheduler-to-repl"><span class="toc-number">5.</span> <span class="toc-text">Adding Scheduler to REPL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#assembler"><span class="toc-number">5.1.</span> <span class="toc-text">Assembler</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#first-new-function"><span class="toc-number">6.</span> <span class="toc-text">First New Function</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#testing-1"><span class="toc-number">7.</span> <span class="toc-text">Testing</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#whaaa"><span class="toc-number">7.0.0.1.</span> <span class="toc-text">Whaaa?</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#a-surprise-failure"><span class="toc-number">8.</span> <span class="toc-text">A Surprise Failure!</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#wrap-up"><span class="toc-number">9.</span> <span class="toc-text">Wrap Up</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

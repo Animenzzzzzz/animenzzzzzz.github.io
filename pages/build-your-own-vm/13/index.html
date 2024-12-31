@@ -1,0 +1,357 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Labels | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Intro Hey everyone! I know I promised labels in the previous part, but as I was writing it, I realized there’s some pre-reqs we can do. Completing them will make implementing Labels and Directives">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Labels">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/13/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="Intro Hey everyone! I know I promised labels in the previous part, but as I was writing it, I realized there’s some pre-reqs we can do. Completing them will make implementing Labels and Directives">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2024-12-25T06:12:28.000Z">
+<meta property="article:modified_time" content="2024-12-25T09:03:46.119Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/13/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Labels',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-12-25 17:03:46'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Labels</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-25T06:12:28.000Z" title="发表于 2024-12-25 14:12:28">2024-12-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-25T09:03:46.119Z" title="更新于 2024-12-25 17:03:46">2024-12-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Labels"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="intro">Intro</h2>
+<p>Hey everyone! I know I promised labels in the previous part, but as I
+was writing it, I realized there’s some pre-reqs we can do. Completing
+them will make implementing <code>Labels</code> and
+<code>Directives</code> much easier. === New Tokens OK, first up! To
+handle <code>Labels</code> and <code>Directives</code> we need to add
+three new Token types over in <code>src/assembler/mod.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Debug, PartialEq)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">enum</span> <span class="title class_">Token</span> &#123;</span><br><span class="line">    Op &#123; code: Opcode &#125;,</span><br><span class="line">    Register &#123; reg_num: <span class="type">u8</span> &#125;,</span><br><span class="line">    IntegerOperand &#123; value: <span class="type">i32</span> &#125;,</span><br><span class="line">    LabelDeclaration &#123; name: <span class="type">String</span> &#125;,</span><br><span class="line">    LabelUsage &#123; name: <span class="type">String</span> &#125;,</span><br><span class="line">    Directive &#123; name: <span class="type">String</span> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Don’t worry about what those are, yet.</p>
+<h2 id="tweak-assemblyinstruction">Tweak AssemblyInstruction</h2>
+<p>This is an easy one! Head over to <code>instruction_parsers.rs</code>
+and let’s add the new fields to our AssemblerInstruction:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Debug, PartialEq)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">AssemblerInstruction</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> opcode: <span class="type">Option</span>&lt;Token&gt;,</span><br><span class="line">    <span class="keyword">pub</span> label: <span class="type">Option</span>&lt;Token&gt;,</span><br><span class="line">    <span class="keyword">pub</span> directive: <span class="type">Option</span>&lt;Token&gt;,</span><br><span class="line">    <span class="keyword">pub</span> operand1: <span class="type">Option</span>&lt;Token&gt;,</span><br><span class="line">    <span class="keyword">pub</span> operand2: <span class="type">Option</span>&lt;Token&gt;,</span><br><span class="line">    <span class="keyword">pub</span> operand3: <span class="type">Option</span>&lt;Token&gt;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>First thing to note is that we’ve made everything optional. This is
+because we now can start an instruction with a <code>Directive</code>
+<strong>OR</strong> an <code>Opcode</code>. The second thing is the
+addition of the label and directive fields. We’ll need these later
+on.</p>
+<h2 id="instruction-forms-everywhere">Instruction Forms Everywhere!</h2>
+<p>Right now, we are writing one parser per instruction form. One for
+<code>&lt;opcode&gt;</code>, one for
+<code>&lt;opcode&gt; &lt;operand&gt;</code> and so on. We should
+probably optimize it a bit, so let’s combine all those parsers into
+one.</p>
+<p>First step is we need to include registers as operands. Open up
+<code>src/assembly/operand_parsers.rs</code> and add the following:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> assembler::register_parsers::register;</span><br></pre></td></tr></table></figure>
+<p>and then to the <code>operand</code> parser, add it like so:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">named!(<span class="keyword">pub</span> operand&lt;CompleteStr, Token&gt;,</span><br><span class="line">    alt!(</span><br><span class="line">        integer_operand |</span><br><span class="line">        register</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>Next, head over to <code>instruction_parsers.rs</code> and add this
+parser:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">named!(instruction_combined&lt;CompleteStr, AssemblerInstruction&gt;,</span><br><span class="line">    do_parse!(</span><br><span class="line">        l: opt!(label_declaration) &gt;&gt;</span><br><span class="line">        o: opcode &gt;&gt;</span><br><span class="line">        o1: opt!(operand) &gt;&gt;</span><br><span class="line">        o2: opt!(operand) &gt;&gt;</span><br><span class="line">        o3: opt!(operand) &gt;&gt;</span><br><span class="line">        (</span><br><span class="line">            AssemblerInstruction&#123;</span><br><span class="line">                opcode: <span class="title function_ invoke__">Some</span>(o),</span><br><span class="line">                label: l,</span><br><span class="line">                directive: <span class="literal">None</span>,</span><br><span class="line">                operand1: o1,</span><br><span class="line">                operand2: o2,</span><br><span class="line">                operand3: o3,</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>And now, we need to do the same for directives. Open up
+<code>directive_parsers.rs</code> and add replace all the macros in
+there with these:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">named!(directive_declaration&lt;CompleteStr, Token&gt;,</span><br><span class="line">  do_parse!(</span><br><span class="line">      tag!(<span class="string">&quot;.&quot;</span>) &gt;&gt;</span><br><span class="line">      name: alpha1 &gt;&gt;</span><br><span class="line">      (</span><br><span class="line">        Token::Directive&#123;name: name.<span class="title function_ invoke__">to_string</span>()&#125;</span><br><span class="line">      )</span><br><span class="line">  )</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">named!(directive_combined&lt;CompleteStr, AssemblerInstruction&gt;,</span><br><span class="line">    ws!(</span><br><span class="line">        do_parse!(</span><br><span class="line">            tag!(<span class="string">&quot;.&quot;</span>) &gt;&gt;</span><br><span class="line">            name: directive_declaration &gt;&gt;</span><br><span class="line">            o1: opt!(operand) &gt;&gt;</span><br><span class="line">            o2: opt!(operand) &gt;&gt;</span><br><span class="line">            o3: opt!(operand) &gt;&gt;</span><br><span class="line">            (</span><br><span class="line">                AssemblerInstruction&#123;</span><br><span class="line">                    opcode: <span class="literal">None</span>,</span><br><span class="line">                    directive: <span class="title function_ invoke__">Some</span>(name),</span><br><span class="line">                    label: <span class="literal">None</span>,</span><br><span class="line">                    operand1: o1,</span><br><span class="line">                    operand2: o2,</span><br><span class="line">                    operand3: o3,</span><br><span class="line">                &#125;</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">/// Will try to parse out any of the Directive forms</span></span><br><span class="line">named!(<span class="keyword">pub</span> directive&lt;CompleteStr, AssemblerInstruction&gt;,</span><br><span class="line">    do_parse!(</span><br><span class="line">        ins: alt!(</span><br><span class="line">            directive_combined</span><br><span class="line">        ) &gt;&gt;</span><br><span class="line">        (</span><br><span class="line">            ins</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>This mirrors the structure of the instruction parsers. Next, change
+the instruction parser to look like this:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Will try to parse out any of the Instruction forms</span></span><br><span class="line">named!(<span class="keyword">pub</span> instruction&lt;CompleteStr, AssemblerInstruction&gt;,</span><br><span class="line">    do_parse!(</span><br><span class="line">        ins: alt!(</span><br><span class="line">            instruction |</span><br><span class="line">            directive</span><br><span class="line">        ) &gt;&gt;</span><br><span class="line">        (</span><br><span class="line">            ins</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h2 id="summary">Summary</h2>
+<p>The end result of all these changes is that we can now accept more
+forms, such as:</p>
+<p><code>&lt;directive&gt; &lt;opcode&gt; &lt;directive&gt; &lt;operand&gt; &lt;directive&gt; &lt;operand&gt; &lt;operand&gt; &lt;directive&gt; &lt;operand&gt; &lt;operand&gt; &lt;operand&gt; &lt;opcode&gt; &lt;operand&gt; &lt;opcode&gt; &lt;operand&gt; &lt;operand&gt; &lt;opcode&gt; &lt;operand&gt; &lt;operand&gt; &lt;operand&gt;</code></p>
+<p>And we reduced the number of parsers needed. Make sure
+<code>cargo test</code> still passes, and then on to…​</p>
+<h2 id="labels">Labels</h2>
+<p>I should probably explain what a label even is. =)</p>
+<h3 id="what-is-a-label">What is a Label?</h3>
+<blockquote>
+<p>In assembly, labels give a logical name to a specific instruction
+that you can later reference. For example:</p>
+</blockquote>
+<blockquote>
+<p>test1: LOAD $0 #100</p>
+</blockquote>
+<p>You can then use <code>@test</code> as an operand for certain
+instructions, such as jump targets:</p>
+<blockquote>
+<p>DJMP <span class="citation" data-cites="test1">@test1</span></p>
+</blockquote>
+<p>This will require a new file. Make
+<code>src/assembler/label_parsers.rs</code>, and in it put these two
+parsers:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> nom::types::CompleteStr;</span><br><span class="line"><span class="keyword">use</span> nom::&#123;alphanumeric, multispace&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> assembler::Token;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// Looks for a user-defined label, such as `label1:`</span></span><br><span class="line">named!(<span class="keyword">pub</span> label_declaration&lt;CompleteStr, Token&gt;,</span><br><span class="line">    ws!(</span><br><span class="line">        do_parse!(</span><br><span class="line">            name: alphanumeric &gt;&gt;</span><br><span class="line">            tag!(<span class="string">&quot;:&quot;</span>) &gt;&gt;</span><br><span class="line">            opt!(multispace) &gt;&gt;</span><br><span class="line">            (</span><br><span class="line">                Token::LabelDeclaration&#123;name: name.<span class="title function_ invoke__">to_string</span>()&#125;</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">/// Looks for a user-defined label, such as `label1:`</span></span><br><span class="line">named!(<span class="keyword">pub</span> label_usage&lt;CompleteStr, Token&gt;,</span><br><span class="line">    ws!(</span><br><span class="line">        do_parse!(</span><br><span class="line">            tag!(<span class="string">&quot;@&quot;</span>) &gt;&gt;</span><br><span class="line">            name: alphanumeric &gt;&gt;</span><br><span class="line">            opt!(multispace) &gt;&gt;</span><br><span class="line">            (</span><br><span class="line">                Token::LabelUsage&#123;name: name.<span class="title function_ invoke__">to_string</span>()&#125;</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>These will let us spot the declaration (<code>some_label:</code>) of
+a label and its usage (<code>@some_label</code>).</p>
+<h3 id="tests">Tests</h3>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_parse_label_declaration</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">label_declaration</span>(<span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;test:&quot;</span>));</span><br><span class="line">    <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">    <span class="keyword">let</span> (_, token) = result.<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="built_in">assert_eq!</span>(token, Token::LabelDeclaration &#123; name: <span class="string">&quot;test&quot;</span>.<span class="title function_ invoke__">to_string</span>() &#125;);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">label_declaration</span>(<span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;test&quot;</span>));</span><br><span class="line">    <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_parse_label_usage</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">label_usage</span>(<span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;@test&quot;</span>));</span><br><span class="line">    <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">    <span class="keyword">let</span> (_, token) = result.<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="built_in">assert_eq!</span>(token, Token::LabelUsage &#123; name: <span class="string">&quot;test&quot;</span>.<span class="title function_ invoke__">to_string</span>() &#125;);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">label_usage</span>(<span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;test&quot;</span>));</span><br><span class="line">    <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="a-slight-digression">A Slight Digression</h2>
+<p>Before we move on, we need to talk a bit more about how assemblers
+work.</p>
+<h3 id="passes">Passes</h3>
+<p>Assemblers operate in 1 or more "passes". That is, they read through
+the written code, do something, then repeats until done. Our assembler
+is going to be a <em>two-pass assembler</em>. There is no hard and fast
+rules on what must be done in which pass. A pass might be to identify
+all variables, or to do an optimization.</p>
+<p>Why do a two-pass assembler? Well, it has to do with the <em>forward
+reference problem</em>.</p>
+<h3 id="using-labels">Using Labels</h3>
+<p>Even though we can now parse labels, we can’t actually use them for
+anything. They don’t get turned into bytes and written out to our
+bytecode. They are for use during the assembly phase.</p>
+<p>Consider what would happen if we tried to run this code:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">JMP @target</span><br><span class="line">target: HLT</span><br></pre></td></tr></table></figure>
+<p>We are trying to use the label as an operand before we create it.
+This is sometimes called the <em>forward reference problem</em>, and
+we’ll solve it by doing two passes.</p>
+<h3 id="storing-symbols">Storing Symbols</h3>
+<p>Another issue is where do we store the values of each symbol (of
+which a label is one type)?</p>
+<p>The answer to this one is something called a
+<code>Symbol Table</code>. This is a data structure that the assembler
+maintains while going through the code. It stores metadata about the
+code, such as which byte offset a symbol is for.</p>
+<p>Our <code>Symbol Table</code> will look like this:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Symbol Name</th>
+<th style="text-align: center;">Symbol Type</th>
+<th style="text-align: center;">Symbol Offset</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">some_label</td>
+<td style="text-align: center;">Label</td>
+<td style="text-align: center;">12</td>
+</tr>
+</tbody>
+</table>
+<h3 id="but-first">But first…​</h3>
+<p>Before we start on passes, labels, and symbols, let’s add two new
+abilities to our REPL:</p>
+<ol type="1">
+<li>A command to clear the program vector</li>
+<li>The ability to read from a file</li>
+</ol>
+<p>The first one I will leave up to you. The second one requires adding
+a new match arm for <code>.load_file</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;.load_file&quot;</span> =&gt; &#123;</span><br><span class="line">    <span class="built_in">print!</span>(<span class="string">&quot;Please enter the path to the file you wish to load: &quot;</span>);</span><br><span class="line">    io::<span class="title function_ invoke__">stdout</span>().<span class="title function_ invoke__">flush</span>().<span class="title function_ invoke__">expect</span>(<span class="string">&quot;Unable to flush stdout&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">tmp</span> = <span class="type">String</span>::<span class="title function_ invoke__">new</span>();</span><br><span class="line">    stdin.<span class="title function_ invoke__">read_line</span>(&amp;<span class="keyword">mut</span> tmp).<span class="title function_ invoke__">expect</span>(<span class="string">&quot;Unable to read line from user&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">tmp</span> = tmp.<span class="title function_ invoke__">trim</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">filename</span> = Path::<span class="title function_ invoke__">new</span>(&amp;tmp);</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">f</span> = File::<span class="title function_ invoke__">open</span>(Path::<span class="title function_ invoke__">new</span>(&amp;filename)).<span class="title function_ invoke__">expect</span>(<span class="string">&quot;File not found&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">contents</span> = <span class="type">String</span>::<span class="title function_ invoke__">new</span>();</span><br><span class="line">    f.<span class="title function_ invoke__">read_to_string</span>(&amp;<span class="keyword">mut</span> contents).<span class="title function_ invoke__">expect</span>(<span class="string">&quot;There was an error reading from the file&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">program</span> = <span class="keyword">match</span> <span class="title function_ invoke__">program</span>(<span class="title function_ invoke__">CompleteStr</span>(&amp;contents)) &#123;</span><br><span class="line">        <span class="comment">// Rusts pattern matching is pretty powerful an can even be nested</span></span><br><span class="line">        <span class="title function_ invoke__">Ok</span>((_remainder, program)) =&gt; &#123;</span><br><span class="line">            program</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;Unable to parse input: &#123;:?&#125;&quot;</span>, e);</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">self</span>.vm.program.<span class="title function_ invoke__">append</span>(&amp;<span class="keyword">mut</span> program.<span class="title function_ invoke__">to_bytes</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The match arm is similar, except this tries to read code from a file
+and then hands it over to the parser. Later, the match on program in
+both <code>.load_file</code> and can go into a common function.</p>
+<h2 id="end">End</h2>
+<p>I think that’s enough for this article. In the next one, we’ll
+continue working on our assembler and build a symbol table. The code is
+in <a target="_blank" rel="noopener" href="https://gitlab.com/subnetzero/iridium">GitLab</a> if you
+need it. See you later!</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/13/">https://animenzzzzzz.github.io/pages/build-your-own-vm/13/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/12/" title="Strings"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Strings</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/14/" title="Symbol Tables"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Symbol Tables</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/03/" title="More Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">More Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#intro"><span class="toc-number">1.</span> <span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tweak-assemblyinstruction"><span class="toc-number">2.</span> <span class="toc-text">Tweak AssemblyInstruction</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#instruction-forms-everywhere"><span class="toc-number">3.</span> <span class="toc-text">Instruction Forms Everywhere!</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#summary"><span class="toc-number">4.</span> <span class="toc-text">Summary</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#labels"><span class="toc-number">5.</span> <span class="toc-text">Labels</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#what-is-a-label"><span class="toc-number">5.1.</span> <span class="toc-text">What is a Label?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tests"><span class="toc-number">5.2.</span> <span class="toc-text">Tests</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#a-slight-digression"><span class="toc-number">6.</span> <span class="toc-text">A Slight Digression</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#passes"><span class="toc-number">6.1.</span> <span class="toc-text">Passes</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#using-labels"><span class="toc-number">6.2.</span> <span class="toc-text">Using Labels</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#storing-symbols"><span class="toc-number">6.3.</span> <span class="toc-text">Storing Symbols</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#but-first"><span class="toc-number">6.4.</span> <span class="toc-text">But first…​</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#end"><span class="toc-number">7.</span> <span class="toc-text">End</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
