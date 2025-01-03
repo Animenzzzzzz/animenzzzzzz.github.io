@@ -1,0 +1,476 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Extending Palladium - Part 1 | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Intro Hey everyone! For this tutorial, we’re going to switch tracks and work on Palladium a bit. Right now, it handles simple arithmetic expressions, such as 2+1, and that’s it. Let’s see if we ca">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Extending Palladium - Part 1">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/25/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="Intro Hey everyone! For this tutorial, we’re going to switch tracks and work on Palladium a bit. Right now, it handles simple arithmetic expressions, such as 2+1, and that’s it. Let’s see if we ca">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2025-01-03T01:12:51.000Z">
+<meta property="article:modified_time" content="2025-01-03T07:36:48.318Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/25/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Extending Palladium - Part 1',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-03 15:36:48'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Extending Palladium - Part 1</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-03T01:12:51.000Z" title="发表于 2025-01-03 09:12:51">2025-01-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-01-03T07:36:48.318Z" title="更新于 2025-01-03 15:36:48">2025-01-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Extending Palladium - Part 1"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="intro">Intro</h2>
+<p>Hey everyone! For this tutorial, we’re going to switch tracks and
+work on Palladium a bit. Right now, it handles simple arithmetic
+expressions, such as <code>2+1</code>, and that’s it. Let’s see if we
+can get it to handle something more complex. === Goals</p>
+<ol type="1">
+<li>Handle parenthetical expressions (e.g., <code>(4-3)*2)</code>)</li>
+<li>Teach our parser to handle floating point numbers</li>
+</ol>
+<h2 id="parser">Parser</h2>
+<p>Let’s do a quick review:</p>
+<ol type="1">
+<li>A <code>Program</code> is composed of <code>Expressions</code></li>
+<li>An <code>Expression</code> returns a value</li>
+<li>An <code>Operand</code> is the left and right sides of an
+<code>Operator</code>, e.g., in 2+1 the operands are 2 and 1</li>
+<li>An <code>Operator</code> is <code>+,-,*,/</code></li>
+<li>Nom parses all this into <code>Tokens</code> (found in
+<code>src/tokens.rs</code>)</li>
+</ol>
+<p>We’re going to change our definitions a bit:</p>
+<ol type="1">
+<li>An <code>Expression</code> consists of <code>Terms</code></li>
+<li>A <code>Term</code> consists of <code>Factors</code></li>
+<li>A <code>Term</code> is added or subtracted</li>
+<li>A <code>Factor</code> is multiplied or divided</li>
+<li>A <code>Factor</code> can be surrounded by a <code>(</code> and a
+<code>)</code></li>
+</ol>
+<blockquote>
+<p>Time for some math talk! Don’t worry, it isn’t complicated. =)</p>
+</blockquote>
+<blockquote>
+<p>Unless you’ve worked with a Lisp-style language (e.g., Clojure) or
+one of those old HP calculators, you’re probably accustomed to seeing
+all math expressions written in the following form:</p>
+</blockquote>
+<blockquote>
+<p>3+1</p>
+</blockquote>
+<blockquote>
+<p>2 * (1+1)</p>
+</blockquote>
+<blockquote>
+<p>See how the operator is in the middle? This is called <strong>infix
+notation</strong>. This is not the only way to write expressions,
+though. What if we wrote <code>3+1</code> as <code>3 1 +</code>? That’s
+called <strong>postfix notation</strong>. And what if we wrote it as
+<code>+ 3 1</code>? That’s called <strong>prefix notation</strong>. Pre
+and postfix notation are actually much easier to parse, but it raises
+the barrier to entry to your language, as people tend to dislike using
+non-infix notation.</p>
+</blockquote>
+<h2 id="new-tokens">New Tokens</h2>
+<p>Head over to <code>src/tokens.rs</code>. We need to change a few
+things:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Debug, PartialEq, Clone)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">enum</span> <span class="title class_">Token</span> &#123;</span><br><span class="line">    AdditionOperator,</span><br><span class="line">    SubtractionOperator,</span><br><span class="line">    MultiplicationOperator,</span><br><span class="line">    DivisionOperator,</span><br><span class="line">    Integer&#123; value: <span class="type">i64</span> &#125;,</span><br><span class="line">    Float&#123; value: <span class="type">f64</span>&#125;,</span><br><span class="line">    Factor&#123; value: <span class="type">Box</span>&lt;Token&gt; &#125;,</span><br><span class="line">    Term&#123; left: <span class="type">Box</span>&lt;Token&gt;, right: <span class="type">Vec</span>&lt;(Token, Token)&gt; &#125;,</span><br><span class="line">    Expression&#123; left: <span class="type">Box</span>&lt;Token&gt;, right: <span class="type">Vec</span>&lt;(Token, Token)&gt; &#125;,</span><br><span class="line">    Program&#123; expressions: <span class="type">Vec</span>&lt;Token&gt; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>We’ve added a Token for <code>Float</code>, <code>Factor</code>, and
+<code>Term</code>. We also have removed the <code>op</code> field from
+<code>Expression</code>, and replaced with a <code>Vec</code> of tuples.
+We’ll see why in a minute.</p>
+<p>We also have to stub out match arms for the new tokens in
+<code>visitor.rs</code>. For now, they can just look like:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&amp;Token::Float&#123; value &#125; =&gt; &#123;&#125;,</span><br><span class="line">&amp;Token::Factor&#123; <span class="keyword">ref</span> value &#125; =&gt; &#123;&#125;,</span><br><span class="line">&amp;Token::Term&#123; <span class="keyword">ref</span> left, <span class="keyword">ref</span> right &#125; =&gt; &#123;&#125;,</span><br><span class="line">&amp;Token::Expression&#123; <span class="keyword">ref</span> left, <span class="keyword">ref</span> right &#125; =&gt; &#123;&#125;,</span><br><span class="line">&amp;Token::Program&#123; <span class="keyword">ref</span> expressions &#125; =&gt; &#123;&#125;,</span><br></pre></td></tr></table></figure>
+<h2 id="factors">Factors</h2>
+<p>Now let’s teach our parser what a factor is. Make
+<code>src/factor_parsers.rs</code>, and in it put:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> nom::*;</span><br><span class="line"><span class="keyword">use</span> nom::types::CompleteStr;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> tokens::Token;</span><br><span class="line"><span class="keyword">use</span> expression_parsers::expression;</span><br><span class="line"></span><br><span class="line">named!(float64&lt;CompleteStr, Token&gt;,</span><br><span class="line">    ws!(</span><br><span class="line">        do_parse!(</span><br><span class="line">            sign: opt!(tag!(<span class="string">&quot;-&quot;</span>)) &gt;&gt;</span><br><span class="line">            left_nums: digit &gt;&gt;</span><br><span class="line">            tag!(<span class="string">&quot;.&quot;</span>) &gt;&gt;</span><br><span class="line">            right_nums: digit &gt;&gt;</span><br><span class="line">            (</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">tmp</span> = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">                    <span class="keyword">if</span> sign.<span class="title function_ invoke__">is_some</span>() &#123;</span><br><span class="line">                        tmp.<span class="title function_ invoke__">push_str</span>(<span class="string">&quot;-&quot;</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                    tmp.<span class="title function_ invoke__">push_str</span>(&amp;left_nums.<span class="title function_ invoke__">to_string</span>());</span><br><span class="line">                    tmp.<span class="title function_ invoke__">push_str</span>(<span class="string">&quot;.&quot;</span>);</span><br><span class="line">                    tmp.<span class="title function_ invoke__">push_str</span>(&amp;right_nums.<span class="title function_ invoke__">to_string</span>());</span><br><span class="line">                    <span class="keyword">let</span> <span class="variable">converted</span> = tmp.parse::&lt;<span class="type">f64</span>&gt;().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">                    Token::Factor&#123; value: <span class="type">Box</span>::<span class="title function_ invoke__">new</span>(Token::Float&#123;value: converted&#125;) &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>The parser does the following:</p>
+<ol type="1">
+<li>Consume any whitespace</li>
+<li>Check if there is a <code>-</code>. Because we use
+<code>opt!</code>, it is optional. This is to handle negative
+floats.</li>
+<li>Consume all digits until it encounters .</li>
+<li>Consume all digits after the .</li>
+<li>Construct the final floating point string representation</li>
+<li>Convert it to a <code>f64</code></li>
+<li>Return a <code>Factor</code> token that contains a
+<code>Float</code> token</li>
+</ol>
+<p>A few examples of the floats this parser is meant to detect are:</p>
+<ol type="1">
+<li>1.0</li>
+<li>-1.0</li>
+<li>323.8</li>
+<li>1.453</li>
+</ol>
+<p>It’s nearly identical to our integer parser. And since an integer is
+also a Factor, let’s move our integer parser over:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">named!(integer&lt;CompleteStr, Token&gt;,</span><br><span class="line">    ws!(</span><br><span class="line">        do_parse!(</span><br><span class="line">            sign: opt!(tag!(<span class="string">&quot;-&quot;</span>)) &gt;&gt;</span><br><span class="line">            reg_num: digit &gt;&gt;</span><br><span class="line">            (</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">tmp</span> = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">                    <span class="keyword">if</span> sign.<span class="title function_ invoke__">is_some</span>() &#123;</span><br><span class="line">                        tmp.<span class="title function_ invoke__">push_str</span>(<span class="string">&quot;-&quot;</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                    tmp.<span class="title function_ invoke__">push_str</span>(&amp;reg_num.<span class="title function_ invoke__">to_string</span>());</span><br><span class="line">                    <span class="keyword">let</span> <span class="variable">converted</span> = tmp.parse::&lt;<span class="type">i64</span>&gt;().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">                    Token::Integer&#123; value: converted &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>No changes to it, just changing its location.</p>
+<p>And now, at last, the <code>Factor</code> parser! It looks like
+this:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">named!(<span class="keyword">pub</span> factor&lt;CompleteStr, Token&gt;,</span><br><span class="line">    ws!(</span><br><span class="line">        do_parse!(</span><br><span class="line">            f: alt!(</span><br><span class="line">                integer |</span><br><span class="line">                float64 |</span><br><span class="line">                ws!(delimited!( tag_s!(<span class="string">&quot;(&quot;</span>), expression, tag_s!(<span class="string">&quot;)&quot;</span>) ))</span><br><span class="line">            ) &gt;&gt;</span><br><span class="line">            (</span><br><span class="line">                &#123;</span><br><span class="line">                    Token::Factor&#123;value: <span class="type">Box</span>::<span class="title function_ invoke__">new</span>(f)&#125;</span><br><span class="line">                &#125;</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>Here’s a breakdown of what it is meant to do:</p>
+<ol type="1">
+<li>Try the <code>integer</code> parser that we just moved into the same
+file</li>
+<li>Try the <code>float64</code> parser we just made</li>
+<li><strong>Look for an <code>Expression</code> surrounded by
+<code>(</code> and <code>)</code></strong></li>
+</ol>
+<p>The last one is very important, because it is what allows us to
+expressions with nested parentheses.</p>
+<h2 id="expression-parser">Expression Parser</h2>
+<p>Open up <code>src/expression_parsers.rs</code>. We need to change
+that parser a bit to work with our new Factor parser. The new
+<code>Expression</code> parser looks like this:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> nom::types::CompleteStr;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> tokens::Token;</span><br><span class="line"><span class="keyword">use</span> term_parsers::term;</span><br><span class="line"><span class="keyword">use</span> operator_parsers::*;</span><br><span class="line"></span><br><span class="line">named!(<span class="keyword">pub</span> expression&lt;CompleteStr,Token&gt;,</span><br><span class="line">    do_parse!(</span><br><span class="line">        left: term &gt;&gt;</span><br><span class="line">        right: many0!(</span><br><span class="line">            tuple!(</span><br><span class="line">                alt!(</span><br><span class="line">                    addition_operator |</span><br><span class="line">                    subtraction_operator</span><br><span class="line">                ),</span><br><span class="line">                term</span><br><span class="line">            )</span><br><span class="line">        ) &gt;&gt;</span><br><span class="line">        (</span><br><span class="line">            &#123;</span><br><span class="line">                Token::Expression&#123;left: <span class="type">Box</span>::<span class="title function_ invoke__">new</span>(left), right: right&#125;</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Note the <code>use</code> changes. We are importing the Term parser,
+which we haven’t written yet. We’ll get there, don’t worry!</p>
+</blockquote>
+<p>What this parser now does is:</p>
+<ol type="1">
+<li>Look for a <code>Term</code> 2 Looks for zero or characters that
+match the following pattern: <code>+</code> or <code>-</code> then a
+<code>Term</code></li>
+<li>Because we use the <code>tuple!</code> macro, we will get back a
+<code>(Token, Token)</code> result, which is why we had to change our
+<code>Token</code> definitions a bit.</li>
+<li>Construct an <code>Expression</code> and return it</li>
+</ol>
+<h2 id="term-parser">Term Parser</h2>
+<p>Our last new parser is the <code>Term</code> parser. Make
+<code>src/term_parsers.rs</code>, and in it put:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> nom::types::CompleteStr;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> tokens::Token;</span><br><span class="line"><span class="keyword">use</span> factor_parsers::factor;</span><br><span class="line"><span class="keyword">use</span> operator_parsers::&#123;multiplication_operator, division_operator&#125;;</span><br><span class="line"></span><br><span class="line">named!(<span class="keyword">pub</span> term&lt;CompleteStr,Token&gt;,</span><br><span class="line">    do_parse!(</span><br><span class="line">        left: factor &gt;&gt;</span><br><span class="line">        right: many0!(</span><br><span class="line">            tuple!(</span><br><span class="line">                alt!(</span><br><span class="line">                    multiplication_operator |</span><br><span class="line">                    division_operator</span><br><span class="line">                ),</span><br><span class="line">                factor</span><br><span class="line">            )</span><br><span class="line">        ) &gt;&gt;</span><br><span class="line">        (</span><br><span class="line">            &#123;</span><br><span class="line">                Token::Term&#123;left: <span class="type">Box</span>::<span class="title function_ invoke__">new</span>(left), right: right&#125;</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>It does almost the same thing as the <code>Factor</code> parser:</p>
+<ol type="1">
+<li>Look for a <code>Factor</code></li>
+<li>Looks for zero or characters that match the following pattern:
+<code>*</code> or <code>/</code> then a <code>Factor</code></li>
+<li>Because we use the <code>tuple!</code> macro, we will get back a
+<code>(Token, Token)</code> result, which is why we had to change our
+<code>Token</code> definitions a bit.</li>
+<li>Construct a <code>Term</code> and return it</li>
+</ol>
+<blockquote>
+<p>Note how <code>Term</code> looks for <code>*</code>and
+<code>/</code>, while <code>Factor</code> looks for <code>+</code> and
+<code>-</code>. This is how we establish operator precedence.</p>
+</blockquote>
+<h2 id="sample-expression">Sample Expression</h2>
+<p>Let’s take a look at what Nom turns <code>3*4</code> into:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">(</span><br><span class="line">    <span class="title function_ invoke__">CompleteStr</span>(</span><br><span class="line">        <span class="string">&quot;&quot;</span></span><br><span class="line">    ),</span><br><span class="line">    Term &#123;</span><br><span class="line">        left: Factor &#123;</span><br><span class="line">            value: Integer &#123;</span><br><span class="line">                value: <span class="number">3</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        right: [</span><br><span class="line">            (</span><br><span class="line">                MultiplicationOperator,</span><br><span class="line">                Factor &#123;</span><br><span class="line">                    value: Integer &#123;</span><br><span class="line">                        value: <span class="number">4</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            )</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>On the left hand side, we have a <code>Term</code>, which has a
+<code>Factor</code>, which has an <code>Integer</code>. On the right, we
+have a <code>Vec</code> containing the
+<code>MultiplicationOperator</code> and a <code>Factor</code> that
+contains an <code>Integer</code>.</p>
+<p>The ASTs for more complex expressions can get a lot larger. =)</p>
+<h2 id="tests">Tests</h2>
+<p>Now let’s write some tests!</p>
+<h3 id="term-tests">Term Tests</h3>
+<p>In <code>term_parsers.rs</code>, put:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mod</span> tests &#123;</span><br><span class="line">    <span class="keyword">use</span> super::*;</span><br><span class="line"></span><br><span class="line">    <span class="meta">#[test]</span></span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">test_parse_term</span>() &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">term</span>(<span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;3*4&quot;</span>));</span><br><span class="line">        <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">#[test]</span></span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">test_parse_nested_term</span>() &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">term</span>(<span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;(3*4)*2&quot;</span>));</span><br><span class="line">        <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">#[test]</span></span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">test_parse_really_nested_term</span>() &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">term</span>(<span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;((3*4)*2)&quot;</span>));</span><br><span class="line">        <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="factor-tests">Factor Tests</h3>
+<p>These go in <code>factor_parsers.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mod</span> tests &#123;</span><br><span class="line">    <span class="keyword">use</span> super::*;</span><br><span class="line">    <span class="meta">#[test]</span></span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">test_factor</span>() &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">test_program</span> = <span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;(1+2)&quot;</span>);</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">factor</span>(test_program);</span><br><span class="line">        <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">        <span class="keyword">let</span> (_, tree) = result.<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;&#123;:#?&#125;&quot;</span>, tree);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">#[test]</span></span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">test_parse_floats</span>() &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">test_floats</span> = <span class="built_in">vec!</span>[<span class="string">&quot;100.4&quot;</span>, <span class="string">&quot;1.02&quot;</span>, <span class="string">&quot;-1.02&quot;</span>];</span><br><span class="line">        <span class="keyword">for</span> <span class="variable">o</span> <span class="keyword">in</span> test_floats &#123;</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">parsed_o</span> = o.parse::&lt;<span class="type">f64</span>&gt;().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">float64</span>(<span class="title function_ invoke__">CompleteStr</span>(o));</span><br><span class="line">            <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">#[test]</span></span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">test_parse_integer</span>() &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">test_integers</span> = <span class="built_in">vec!</span>[<span class="string">&quot;0&quot;</span>, <span class="string">&quot;-1&quot;</span>, <span class="string">&quot;1&quot;</span>];</span><br><span class="line">        <span class="keyword">for</span> <span class="variable">o</span> <span class="keyword">in</span> test_integers &#123;</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">parsed_o</span> = o.parse::&lt;<span class="type">i64</span>&gt;().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">integer</span>(<span class="title function_ invoke__">CompleteStr</span>(o));</span><br><span class="line">            <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="expression-tests">Expression Tests</h3>
+<p>If we want to parse something that has all the operators in it, we
+need to use an Expression. Let’s add a few tests to
+<code>expression_parsers.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_parse_expression</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">expression</span>(<span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;3*4&quot;</span>));</span><br><span class="line">    <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_parse_nested_expression</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">expression</span>(<span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;(3*4)+1&quot;</span>));</span><br><span class="line">    <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="program-tests">Program Tests</h3>
+<p>And finally, let’s do a fancy test in
+<code>program_parsers.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_parse_program</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">test_program</span> = <span class="title function_ invoke__">CompleteStr</span>(<span class="string">&quot;1+2&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">program</span>(test_program);</span><br><span class="line">    <span class="built_in">assert_eq!</span>(result.<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>If you run tests, you probably got a failure similar to this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread &#x27;visitor::tests::test_visit_addition_token&#x27; panicked at &#x27;called `Option::unwrap()` on a `None` value&#x27;, libcore/option.rs:345:21</span><br></pre></td></tr></table></figure>
+<p>What this means is that in our addition function:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&amp;Token::AdditionOperator =&gt; &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Need to clean this up. Remove the unwraps.</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result_register</span> = <span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">left_register</span> = <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">right_register</span> = <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">line</span> = <span class="built_in">format!</span>(<span class="string">&quot;ADD $&#123;&#125; $&#123;&#125; $&#123;&#125;&quot;</span>, left_register, right_register, result_register);</span><br><span class="line">    <span class="keyword">self</span>.assembly.<span class="title function_ invoke__">push</span>(line);</span><br><span class="line">    <span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">push</span>(left_register);</span><br><span class="line">    <span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">push</span>(right_register);</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<p>One of the used registers has not yet been put onto the use stack.
+Remember how we started returning tuples? What’s happening is that in
+the <code>Expression</code> match arm:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&amp;Token::Expression&#123; <span class="keyword">ref</span> left, <span class="keyword">ref</span> right &#125; =&gt; &#123;</span><br><span class="line">    <span class="keyword">self</span>.<span class="title function_ invoke__">visit_token</span>(left);</span><br><span class="line">    <span class="keyword">for</span> <span class="variable">expression</span> <span class="keyword">in</span> right &#123;</span><br><span class="line">        <span class="keyword">self</span>.<span class="title function_ invoke__">visit_token</span>(&amp;expression.<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">self</span>.<span class="title function_ invoke__">visit_token</span>(&amp;expression.<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<p>when it evaluates this section of our tree:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">right: [</span><br><span class="line">    (</span><br><span class="line">        AdditionOperator,</span><br><span class="line">        Term &#123;</span><br><span class="line">            left: Factor &#123;</span><br><span class="line">                value: Integer &#123;</span><br><span class="line">                    value: <span class="number">2</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            right: []</span><br><span class="line">        &#125;</span><br><span class="line">    )</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>It is going to vist the addition operator <strong>before</strong> the
+Integer value. This means that the value 2 has not been put in a
+register yet. We want the <code>Expression</code> function to visit them
+in the reverse order. So change:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&amp;Token::Expression&#123; <span class="keyword">ref</span> left, <span class="keyword">ref</span> right &#125; =&gt; &#123;</span><br><span class="line">    <span class="keyword">self</span>.<span class="title function_ invoke__">visit_token</span>(left);</span><br><span class="line">    <span class="keyword">for</span> <span class="variable">expression</span> <span class="keyword">in</span> right &#123;</span><br><span class="line">      <span class="keyword">self</span>.<span class="title function_ invoke__">visit_token</span>(&amp;expression.<span class="number">0</span>);</span><br><span class="line">      <span class="keyword">self</span>.<span class="title function_ invoke__">visit_token</span>(&amp;expression.<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<p>You’ll also need to do the same to the Term arm.</p>
+<p>Now if we run it..</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">thread &#x27;visitor::tests::test_nested_operators&#x27; panicked at &#x27;called `Option::unwrap()` on a `None` value&#x27;, libcore/option.rs:345:21</span><br><span class="line">note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.</span><br></pre></td></tr></table></figure>
+<p>GRRRR! This one took me a bit of debugging, and I had to write some
+debugging functions to print free and used registers. I also added this
+test to <code>visitor.rs</code>.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_nested_operators</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">compiler</span> = Compiler::<span class="title function_ invoke__">new</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">test_program</span> = <span class="title function_ invoke__">generate_test_program</span>(<span class="string">&quot;(4*3)-1&quot;</span>);</span><br><span class="line">    compiler.<span class="title function_ invoke__">visit_token</span>(&amp;test_program);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">bytecode</span> = compiler.<span class="title function_ invoke__">compile</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The program was parsing fine up until the <code>-</code>; the
+multiplication side was fine. By printing out registers in use when it
+hit the subtract arm:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">--------------------</span><br><span class="line">|  Used Registers  |</span><br><span class="line">--------------------</span><br><span class="line">0</span><br><span class="line">--------------------</span><br><span class="line">|  Free Registers  |</span><br><span class="line">--------------------</span><br><span class="line">30</span><br><span class="line">&lt;snip&gt;</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
+<p>We should have TWO registers in use: One for the result of the
+multiplication instruction, and one for the load instruction of
+<code>1</code>. Clearly that register was never being put on the used
+register list. If we take a look at the arm handling the
+<code>SUB</code> opcode:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">self</span>.<span class="title function_ invoke__">print_used_registers</span>();</span><br><span class="line"><span class="keyword">self</span>.<span class="title function_ invoke__">print_free_registers</span>();</span><br><span class="line"><span class="keyword">let</span> <span class="variable">result_register</span> = <span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line"><span class="keyword">let</span> <span class="variable">left_register</span> = <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line"><span class="keyword">let</span> <span class="variable">right_register</span> = <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line"><span class="keyword">let</span> <span class="variable">line</span> = <span class="built_in">format!</span>(<span class="string">&quot;SUB $&#123;&#125; $&#123;&#125; $&#123;&#125;&quot;</span>, left_register, right_register, result_register);</span><br><span class="line"><span class="keyword">self</span>.assembly.<span class="title function_ invoke__">push</span>(line);</span><br><span class="line"><span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">push</span>(left_register);</span><br><span class="line"><span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">push</span>(right_register);</span><br></pre></td></tr></table></figure>
+<p>See the problem? We never push result_register onto the used register
+list. We can fix it like so:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">self</span>.<span class="title function_ invoke__">print_used_registers</span>();</span><br><span class="line"><span class="keyword">self</span>.<span class="title function_ invoke__">print_free_registers</span>();</span><br><span class="line"><span class="keyword">let</span> <span class="variable">result_register</span> = <span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line"><span class="keyword">let</span> <span class="variable">left_register</span> = <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line"><span class="keyword">let</span> <span class="variable">right_register</span> = <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line"><span class="keyword">let</span> <span class="variable">line</span> = <span class="built_in">format!</span>(<span class="string">&quot;SUB $&#123;&#125; $&#123;&#125; $&#123;&#125;&quot;</span>, left_register, right_register, result_register);</span><br><span class="line"><span class="keyword">self</span>.assembly.<span class="title function_ invoke__">push</span>(line);</span><br><span class="line"><span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">push</span>(result_register);</span><br><span class="line"><span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">push</span>(left_register);</span><br><span class="line"><span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">push</span>(right_register);</span><br></pre></td></tr></table></figure>
+<p>This was an issue in all the operator arms, so fix it the same way in
+the other three. Now if we run them, they should all pass..</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">running 18 tests</span><br><span class="line"><span class="built_in">test</span> operator_parsers::tests::test_parse_division_operator ... ok</span><br><span class="line"><span class="built_in">test</span> operator_parsers::tests::test_parse_addition_operator ... ok</span><br><span class="line"><span class="built_in">test</span> operator_parsers::tests::test_parse_multiplication_operator ... ok</span><br><span class="line"><span class="built_in">test</span> factor_parsers::tests::test_parse_integer ... ok</span><br><span class="line"><span class="built_in">test</span> factor_parsers::tests::test_parse_floats ... ok</span><br><span class="line"><span class="built_in">test</span> expression_parsers::tests::test_parse_expression ... ok</span><br><span class="line"><span class="built_in">test</span> expression_parsers::tests::test_parse_nested_expression ... ok</span><br><span class="line"><span class="built_in">test</span> operator_parsers::tests::test_parse_operator ... ok</span><br><span class="line"><span class="built_in">test</span> operator_parsers::tests::test_parse_subtraction_operator ... ok</span><br><span class="line"><span class="built_in">test</span> program_parsers::tests::test_parse_program ... ok</span><br><span class="line"><span class="built_in">test</span> factor_parsers::tests::test_factor ... ok</span><br><span class="line"><span class="built_in">test</span> term_parsers::tests::test_parse_nested_term ... ok</span><br><span class="line"><span class="built_in">test</span> term_parsers::tests::test_parse_term ... ok</span><br><span class="line"><span class="built_in">test</span> visitor::tests::test_visit_addition_token ... ok</span><br><span class="line"><span class="built_in">test</span> visitor::tests::test_visit_subtraction_token ... ok</span><br><span class="line"><span class="built_in">test</span> term_parsers::tests::test_parse_really_nested_term ... ok</span><br><span class="line"><span class="built_in">test</span> visitor::tests::test_nested_operators ... ok</span><br><span class="line"><span class="built_in">test</span> visitor::tests::test_visit_multiplication_token ... ok</span><br><span class="line"></span><br><span class="line"><span class="built_in">test</span> result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out</span><br></pre></td></tr></table></figure>
+<p>YAY!</p>
+<blockquote>
+<p>I’ve added a few more tests. See the source for details on them.</p>
+</blockquote>
+<h2 id="assembly-output">Assembly Output</h2>
+<p>Let’s add a quick change to print the assembly output of the
+<code>test_nested_operators</code> test:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&quot;.data&quot;</span><br><span class="line">&quot;.code&quot;</span><br><span class="line">&quot;LOAD $0 #4&quot;</span><br><span class="line">&quot;LOAD $1 #3&quot;</span><br><span class="line">&quot;MUL $1 $0 $2&quot;</span><br><span class="line">&quot;LOAD $0 #1&quot;</span><br><span class="line">&quot;SUB $0 $2 $1&quot;</span><br></pre></td></tr></table></figure>
+<p>That looks right! If we go through it step-by-step:</p>
+<ol type="1">
+<li>Load 4 into R0</li>
+<li>Load 3 into R1</li>
+<li>Multiply R0 and R1 and store result in R2 (which has the value of
+12)</li>
+<li>Load 1 into R0</li>
+<li>Subtract R0 from R2 and store result in R3 (which should have 11 at
+the end)</li>
+<li>Crap, that’s -11</li>
+</ol>
+<p>If we run our generated code through the Iridium REPL, we see:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Welcome to Iridium! Let<span class="string">&#x27;s be productive!</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; LOAD $0 #4</span></span><br><span class="line"><span class="string">LOAD $1 #3</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; MUL $1 $0 $2</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; LOAD $0 #1</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; SUB $0 $2 $1</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; !registers</span></span><br><span class="line"><span class="string">Listing registers and all contents:</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">&gt;&gt;&gt; [</span></span><br><span class="line"><span class="string">    1,</span></span><br><span class="line"><span class="string">    -11,</span></span><br><span class="line"><span class="string">    12,</span></span><br><span class="line"><span class="string">    0,</span></span><br><span class="line"><span class="string">    0,</span></span><br><span class="line"><span class="string">// &lt;snip&gt;</span></span><br><span class="line"><span class="string">]</span></span><br></pre></td></tr></table></figure>
+<p>Damnit! In this case, the problem is with Iridium. It handles
+subtraction with this code:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Opcode::SUB =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register1</span> = <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register2</span> = <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>] = register1 - register2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And with how we are outputting code, we would need to either change
+the Iridium VM to do:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Opcode::SUB =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register1</span> = <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register2</span> = <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>] = register2 - register1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Or we can change our parser to output subtraction instructions in the
+opposite order. For now, we’ll do it in the parser, since this is a
+Palladium tutorial. =) In <code>visitor.rs</code>, we can change:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&amp;Token::SubtractionOperator =&gt; &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Need to clean this up. Remove the unwraps.</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result_register</span> = <span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">left_register</span> = <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">right_register</span> = <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">line</span> = <span class="built_in">format!</span>(<span class="string">&quot;SUB $&#123;&#125; $&#123;&#125; $&#123;&#125;&quot;</span>, left_register, right_register, result_register);</span><br><span class="line">    <span class="keyword">self</span>.assembly.<span class="title function_ invoke__">push</span>(line);</span><br><span class="line">    <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">push</span>(result_register);</span><br><span class="line">    <span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">push</span>(left_register);</span><br><span class="line">    <span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">push</span>(right_register);</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<p>to:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&amp;Token::SubtractionOperator =&gt; &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Need to clean this up. Remove the unwraps.</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result_register</span> = <span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">left_register</span> = <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">right_register</span> = <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">pop</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">line</span> = <span class="built_in">format!</span>(<span class="string">&quot;SUB $&#123;&#125; $&#123;&#125; $&#123;&#125;&quot;</span>, right_register, left_register, result_register);</span><br><span class="line">    <span class="keyword">self</span>.assembly.<span class="title function_ invoke__">push</span>(line);</span><br><span class="line">    <span class="keyword">self</span>.used_registers.<span class="title function_ invoke__">push</span>(result_register);</span><br><span class="line">    <span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">push</span>(left_register);</span><br><span class="line">    <span class="keyword">self</span>.free_registers.<span class="title function_ invoke__">push</span>(right_register);</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<p>And now our output is:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&quot;.data&quot;</span><br><span class="line">&quot;.code&quot;</span><br><span class="line">&quot;LOAD $0 #4&quot;</span><br><span class="line">&quot;LOAD $1 #3&quot;</span><br><span class="line">&quot;MUL $1 $0 $2&quot;</span><br><span class="line">&quot;LOAD $0 #1&quot;</span><br><span class="line">&quot;SUB $2 $0 $1&quot;</span><br></pre></td></tr></table></figure>
+<p>And running it through the Iridium REPL:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Welcome to Iridium! Let&#x27;s be productive!</span><br><span class="line">&gt;&gt;&gt; LOAD $0 #4</span><br><span class="line">LOAD $1 #3</span><br><span class="line">&gt;&gt;&gt; MUL $1 $0 $2</span><br><span class="line">&gt;&gt;&gt; LOAD $0 #1</span><br><span class="line">&gt;&gt;&gt; SUB $0 $2 $1</span><br><span class="line">&gt;&gt;&gt; !registers</span><br><span class="line">Listing registers and all contents:</span><br><span class="line">&gt;&gt;&gt; [</span><br><span class="line">    1,</span><br><span class="line">    11,</span><br><span class="line">    12,</span><br><span class="line">    0,</span><br><span class="line">//    &lt;snip&gt;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>OK! YAY FOR REAL NOW!</p>
+<h2 id="end">End</h2>
+<p>That’s it for this installment! See everyone next time!</p>
+<p>refer to <a
+target="_blank" rel="noopener" href="https://blog.subnetzero.io/post/building-language-vm-part-25/">building-language-vm</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/25/">https://animenzzzzzz.github.io/pages/build-your-own-vm/25/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/24/" title="SSH Server - Part 2"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">SSH Server - Part 2</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/26/" title="Adding Floating Point Support"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Adding Floating Point Support</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/03/" title="More Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">More Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#intro"><span class="toc-number">1.</span> <span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#parser"><span class="toc-number">2.</span> <span class="toc-text">Parser</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#new-tokens"><span class="toc-number">3.</span> <span class="toc-text">New Tokens</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#factors"><span class="toc-number">4.</span> <span class="toc-text">Factors</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#expression-parser"><span class="toc-number">5.</span> <span class="toc-text">Expression Parser</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#term-parser"><span class="toc-number">6.</span> <span class="toc-text">Term Parser</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sample-expression"><span class="toc-number">7.</span> <span class="toc-text">Sample Expression</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tests"><span class="toc-number">8.</span> <span class="toc-text">Tests</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#term-tests"><span class="toc-number">8.1.</span> <span class="toc-text">Term Tests</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#factor-tests"><span class="toc-number">8.2.</span> <span class="toc-text">Factor Tests</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#expression-tests"><span class="toc-number">8.3.</span> <span class="toc-text">Expression Tests</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#program-tests"><span class="toc-number">8.4.</span> <span class="toc-text">Program Tests</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#assembly-output"><span class="toc-number">9.</span> <span class="toc-text">Assembly Output</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#end"><span class="toc-number">10.</span> <span class="toc-text">End</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

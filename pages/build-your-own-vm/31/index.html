@@ -1,0 +1,344 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Making Clustering Make Sense | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Intro Sorry everyone! I’ve been busy, hence the delay. Back in tutorial 29, we had two nodes talking to each other, but we got a lot of random text on the screen. Let’s figure out why! The Problem">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Making Clustering Make Sense">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/31/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="Intro Sorry everyone! I’ve been busy, hence the delay. Back in tutorial 29, we had two nodes talking to each other, but we got a lot of random text on the screen. Let’s figure out why! The Problem">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2025-01-03T06:15:04.000Z">
+<meta property="article:modified_time" content="2025-01-03T07:37:41.574Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/31/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Making Clustering Make Sense',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-03 15:37:41'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Making Clustering Make Sense</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-03T06:15:04.000Z" title="发表于 2025-01-03 14:15:04">2025-01-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-01-03T07:37:41.574Z" title="更新于 2025-01-03 15:37:41">2025-01-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Making Clustering Make Sense"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="intro">Intro</h2>
+<p>Sorry everyone! I’ve been busy, hence the delay. Back in tutorial 29,
+we had two nodes talking to each other, but we got a lot of random text
+on the screen. Let’s figure out why!</p>
+<h2 id="the-problem">The Problem</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; !join_cluster 127.0.0.1 2254</span><br><span class="line">Attempting to <span class="built_in">join</span> cluster...</span><br><span class="line">Connected to cluster!</span><br><span class="line">thread <span class="string">&#x27;main&#x27;</span> panicked at <span class="string">&#x27;called `Option::unwrap()` on a `None` value&#x27;</span>, libcore/option.rs:345:21</span><br><span class="line">stack backtrace:</span><br><span class="line">   0: std::sys::unix::backtrace::tracing::imp::unwind_backtrace</span><br><span class="line">   1: std::sys_common::backtrace::<span class="built_in">print</span></span><br><span class="line">   2: std::panicking::default_hook::&#123;&#123;closure&#125;&#125;</span><br><span class="line">   3: std::panicking::default_hook</span><br><span class="line">   4: std::panicking::rust_panic_with_hook</span><br><span class="line">   5: std::panicking::continue_panic_fmt</span><br><span class="line">   6: rust_begin_unwind</span><br><span class="line">   7: core::panicking::panic_fmt</span><br><span class="line">   8: core::panicking::panic</span><br><span class="line">   9: &lt;core::option::Option&lt;T&gt;&gt;::unwrap</span><br><span class="line">  10: iridium::cluster::client::ClusterClient::send_hello</span><br><span class="line">  11: iridium::repl::REPL::join_cluster</span><br><span class="line">  12: iridium::repl::REPL::execute_command</span><br><span class="line">  13: iridium::repl::REPL::run</span><br><span class="line">  14: iridium::main</span><br><span class="line">  15: std::rt::lang_start::&#123;&#123;closure&#125;&#125;</span><br><span class="line">  16: std::panicking::try::do_call</span><br><span class="line">  17: __rust_maybe_catch_panic</span><br><span class="line">  18: std::rt::lang_start_internal</span><br><span class="line">  19: std::rt::lang_start</span><br><span class="line">  20: main</span><br></pre></td></tr></table></figure>
+<p>What is going on in <code>send_hello</code>? Well, we seem to have
+not specified an alias! We can start up an iridium node with no alias.
+Our <code>ClusterClient</code> initialization looks like:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ClusterClient &#123;</span><br><span class="line">    reader: BufReader::<span class="title function_ invoke__">new</span>(reader),</span><br><span class="line">    writer: BufWriter::<span class="title function_ invoke__">new</span>(writer),</span><br><span class="line">    raw_stream: stream,</span><br><span class="line">    _tx: <span class="title function_ invoke__">Some</span>(Arc::<span class="title function_ invoke__">new</span>(Mutex::<span class="title function_ invoke__">new</span>(tx))),</span><br><span class="line">    rx: <span class="title function_ invoke__">Some</span>(Arc::<span class="title function_ invoke__">new</span>(Mutex::<span class="title function_ invoke__">new</span>(rx))),</span><br><span class="line">    alias: <span class="literal">None</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Let’s have the ID be UUID of the VM. We could add a parameter to the
+new function of ClusterClient, or we could a more builder-pattern type
+thing. I’m going to opt for the builder-pattern as I like it. Add a new
+function to <code>ClusterClient</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Sets the alias of the ClusterClient and returns it</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">with_alias</span>(<span class="keyword">mut</span> <span class="keyword">self</span>, alias: <span class="type">String</span>) <span class="punctuation">-&gt;</span> <span class="keyword">Self</span> &#123;</span><br><span class="line">    <span class="keyword">self</span>.alias = <span class="title function_ invoke__">Some</span>(alias);</span><br><span class="line">    <span class="keyword">self</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>In <code>src/vm.rs</code>, we need to make the id attribute
+public:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> id: Uuid,</span><br></pre></td></tr></table></figure>
+<p>Now, over in <code>src/repl/mod.rs</code>, in the
+<code>join_cluster</code> function, we have this line:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">cc</span> = cluster::client::ClusterClient::<span class="title function_ invoke__">new</span>(stream);</span><br></pre></td></tr></table></figure>
+<p>Let’s change it to incorporate our new function:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">cc</span> = cluster::client::ClusterClient::<span class="title function_ invoke__">new</span>(stream).<span class="title function_ invoke__">with_alias</span>(<span class="keyword">self</span>.vm.id.<span class="title function_ invoke__">to_string</span>());</span><br></pre></td></tr></table></figure>
+<p>Now let’s see what happens!</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; Alias is: <span class="string">&quot;aa4356b8-f0a0-4250-b5e5-eaabd265e9b7\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;\u&#123;0&#125;....that goes on for awhile&quot;</span></span><br></pre></td></tr></table></figure>
+<p>But hey, we got the alias portion!</p>
+<h2 id="the-second-problem">The Second Problem</h2>
+<p>Why is it doing this? Well, remember that buffer we declared over in
+<code>src/cluster/server.rs</code>? Let’s look at the section:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">buf</span> = [<span class="number">0</span>; <span class="number">1024</span>];</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">client</span> = ClusterClient::<span class="title function_ invoke__">new</span>(stream);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">_bytes_read</span> = client.reader.<span class="title function_ invoke__">read</span>(&amp;<span class="keyword">mut</span> buf);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">alias</span> = <span class="type">String</span>::<span class="title function_ invoke__">from_utf8_lossy</span>(&amp;buf);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;Alias is: &#123;:?&#125;&quot;</span>, alias);</span><br><span class="line">    client.<span class="title function_ invoke__">run</span>();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>The alias only took up so many bytes, but we are converting all 1024
+into a string! Awkward! What we want is to take a slice and use only the
+number of bytes we read. You can see we even have a handy-dandy
+variable, <code>_bytes_read</code>, that has the info. A slight
+modificiation to our code…​</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">buf</span> = [<span class="number">0</span>; <span class="number">1024</span>];</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">client</span> = ClusterClient::<span class="title function_ invoke__">new</span>(stream);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">bytes_read</span> = client.reader.<span class="title function_ invoke__">read</span>(&amp;<span class="keyword">mut</span> buf).<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">alias</span> = <span class="type">String</span>::<span class="title function_ invoke__">from_utf8_lossy</span>(&amp;buf[<span class="number">0</span>..bytes_read]);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;Alias is: &#123;:?&#125;&quot;</span>, alias);</span><br><span class="line">    client.<span class="title function_ invoke__">run</span>();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>And now let’s try again. On the server side:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Fletchers-MBP:iridium fletcher$ iridium</span><br><span class="line">&gt;&gt;&gt; Welcome to Iridium! Let&#x27;s be productive!</span><br><span class="line">!start_cluster</span><br><span class="line">Started cluster server!</span><br></pre></td></tr></table></figure>
+<p>Then on the client side:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Welcome to Iridium! Let&#x27;s be productive!</span><br><span class="line">&gt;&gt;&gt; !join_cluster 127.0.0.1 2254</span><br><span class="line">Attempting to join cluster...</span><br><span class="line">Connected to cluster!</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<p>Then back on the server side:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; Alias is: &quot;57be0d98-7634-411b-944f-0d1934ead78d&quot;</span><br></pre></td></tr></table></figure>
+<p>Yay! We only read the number of bytes received.</p>
+<blockquote>
+<p>Yes, this means that each time we receive data, we only overwrite
+data up to a certain point in the buffer. If we read 512 bytes, then the
+last 512 bytes would be the 512 bytes from the previous input.</p>
+</blockquote>
+<h2 id="listing-members">Listing Members</h2>
+<p>If, on the VM we used to join the cluster, we run
+<code>!cluster_members</code>, we get:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; !cluster_members</span><br><span class="line">Listing Known Nodes:</span><br><span class="line">&gt;&gt;&gt; [</span><br><span class="line">    &quot;&quot;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>And if we run it on the VM we used to start the cluster, we get:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">!cluster_members</span><br><span class="line">Listing Known Nodes:</span><br><span class="line">&gt;&gt;&gt; []</span><br></pre></td></tr></table></figure>
+<p>We need to finish up the introduction process!</p>
+<h3 id="receiving-the-hello">Receiving the Hello</h3>
+<p>Let’s start from the point of receiving the alias. In our function
+signature for listen, over in <code>src/cluster/server.rs</code>, we
+have:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">listen</span>(addr: SocketAddr, _connection_manager: Arc&lt;RwLock&lt;Manager&gt;&gt;) &#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>Change that to <code>connection_manager</code>, and then the function
+body to look like this:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">listen</span>(addr: SocketAddr, connection_manager: Arc&lt;RwLock&lt;Manager&gt;&gt;) &#123;</span><br><span class="line">    info!(<span class="string">&quot;Initializing Cluster server...&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">listener</span> = TcpListener::<span class="title function_ invoke__">bind</span>(addr).<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">for</span> <span class="variable">stream</span> <span class="keyword">in</span> listener.<span class="title function_ invoke__">incoming</span>() &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">cmgr</span> = connection_manager.<span class="title function_ invoke__">clone</span>();</span><br><span class="line">        info!(<span class="string">&quot;New Node connected!&quot;</span>);</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">stream</span> = stream.<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;</span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">buf</span> = [<span class="number">0</span>; <span class="number">1024</span>];</span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">client</span> = ClusterClient::<span class="title function_ invoke__">new</span>(stream);</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">bytes_read</span> = client.reader.<span class="title function_ invoke__">read</span>(&amp;<span class="keyword">mut</span> buf).<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">alias</span> = <span class="type">String</span>::<span class="title function_ invoke__">from_utf8_lossy</span>(&amp;buf[<span class="number">0</span>..bytes_read]);</span><br><span class="line">            cmgr.<span class="title function_ invoke__">write</span>().<span class="title function_ invoke__">unwrap</span>().<span class="title function_ invoke__">add_client</span>(alias.<span class="title function_ invoke__">to_string</span>(), client);</span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">client</span> = cmgr.<span class="title function_ invoke__">write</span>().<span class="title function_ invoke__">get_client</span>(alias.<span class="title function_ invoke__">to_string</span>());</span><br><span class="line">            client.<span class="title function_ invoke__">run</span>();</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Two important things to note:</p>
+<ol type="1">
+<li>We clone the connection_manager whenever we get a new connection.
+Since this is an Arc, we’re incrementing the reference count. When it
+goes out of scope, the reference count will go down. We do this because
+we don’t want to pass in <code>connection_manager</code> to the thread,
+because we couldn’t make more clones.</li>
+<li>Note how we are not calling <code>client.run()</code>; that’s
+because we pass ownership of the client to the connection manager. We’ll
+move that logic there.</li>
+</ol>
+<h3 id="cluster-manager">Cluster Manager</h3>
+<p>Head over to <code>src/cluster/manager.rs</code>. Our
+<code>add_client</code> function looks like this:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">add_client</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, alias: NodeAlias, client: ClusterClient) <span class="punctuation">-&gt;</span> <span class="type">bool</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">self</span>.clients.<span class="title function_ invoke__">contains_key</span>(&amp;alias) &#123;</span><br><span class="line">        error!(<span class="string">&quot;Tried to add a client that already existed&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    debug!(<span class="string">&quot;Adding &#123;&#125;&quot;</span>, alias);</span><br><span class="line">    client.<span class="title function_ invoke__">run</span>();</span><br><span class="line">    <span class="keyword">self</span>.clients.<span class="title function_ invoke__">insert</span>(alias, client);</span><br><span class="line">    <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Now we call run after it is added. Let’s see if that makes a
+difference:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; !join_cluster 127.0.0.1 2254</span><br><span class="line">Attempting to join cluster...</span><br><span class="line">Connected to cluster!</span><br></pre></td></tr></table></figure>
+<p>And then it will hang. Why? Well, remember how we moved the call to
+run to the connection manager? It’s not starting that in a separate
+thread, so it blocks the main thread.</p>
+<h3 id="the-fix">The Fix</h3>
+<p>I tried a few different things, such as starting <code>run</code> in
+the the <code>add_client</code> function. But, since no matter what
+we’re doing things across threads, we need to wrap the client in an
+Arc.</p>
+<p>Head to <code>src/cluster/manager.rs</code> and change the
+<code>Manager</code> struct to:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Default)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">Manager</span> &#123;</span><br><span class="line">    clients: HashMap&lt;NodeAlias, Arc&lt;RwLock&lt;ClusterClient&gt;&gt;&gt;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Now let’s add a function to our <code>Manager</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">get_client</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, alias: NodeAlias) <span class="punctuation">-&gt;</span> <span class="type">Option</span>&lt;Arc&lt;RwLock&lt;ClusterClient&gt;&gt;&gt; &#123;</span><br><span class="line">    <span class="title function_ invoke__">Some</span>(<span class="keyword">self</span>.clients.<span class="title function_ invoke__">get_mut</span>(&amp;alias).<span class="title function_ invoke__">unwrap</span>().<span class="title function_ invoke__">clone</span>())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>NOTE: We’ll have to pretty this up later…​ And next we need to modify
+the <code>add_client</code> function:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">add_client</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, alias: NodeAlias, client: ClusterClient) <span class="punctuation">-&gt;</span> <span class="type">bool</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">self</span>.clients.<span class="title function_ invoke__">contains_key</span>(&amp;alias) &#123;</span><br><span class="line">        error!(<span class="string">&quot;Tried to add a client that already existed&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">client</span> = Arc::<span class="title function_ invoke__">new</span>(RwLock::<span class="title function_ invoke__">new</span>(client));</span><br><span class="line">    <span class="keyword">self</span>.clients.<span class="title function_ invoke__">insert</span>(alias.<span class="title function_ invoke__">clone</span>(), client);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">cloned_client</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">get_client</span>(alias).<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;</span><br><span class="line">        cloned_client.<span class="title function_ invoke__">write</span>().<span class="title function_ invoke__">unwrap</span>().<span class="title function_ invoke__">run</span>();</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>What we’re doing here is wrapping the client in an <code>Arc</code>
+and <code>RwLock</code>, adding a reference to our HashMap, then
+spawning its run function in a background thread. Finally, we need to
+change our listen function in <code>src/cluster/server.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">listen</span>(addr: SocketAddr, connection_manager: Arc&lt;RwLock&lt;Manager&gt;&gt;) &#123;</span><br><span class="line">    info!(<span class="string">&quot;Initializing Cluster server...&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">listener</span> = TcpListener::<span class="title function_ invoke__">bind</span>(addr).<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">for</span> <span class="variable">stream</span> <span class="keyword">in</span> listener.<span class="title function_ invoke__">incoming</span>() &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">cmgr</span> = connection_manager.<span class="title function_ invoke__">clone</span>();</span><br><span class="line">        info!(<span class="string">&quot;New Node connected!&quot;</span>);</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">stream</span> = stream.<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;</span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">buf</span> = [<span class="number">0</span>; <span class="number">1024</span>];</span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">client</span> = ClusterClient::<span class="title function_ invoke__">new</span>(stream);</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">bytes_read</span> = client.reader.<span class="title function_ invoke__">read</span>(&amp;<span class="keyword">mut</span> buf).<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">alias</span> = <span class="type">String</span>::<span class="title function_ invoke__">from_utf8_lossy</span>(&amp;buf[<span class="number">0</span>..bytes_read]);</span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">cmgr_lock</span> = cmgr.<span class="title function_ invoke__">write</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">            cmgr_lock.<span class="title function_ invoke__">add_client</span>(alias.<span class="title function_ invoke__">to_string</span>(), client);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Note how we no longer call <code>run</code> here. Let’s see what
+happens now if we try to cluster:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Fletchers-MBP:~ fletcher$ iridium</span><br><span class="line">Welcome to Iridium! Let&#x27;s be productive!</span><br><span class="line">&gt;&gt;&gt; !join_cluster 127.0.0.1 2254</span><br><span class="line">Attempting to join cluster...</span><br><span class="line">Connected to cluster!</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<p>Yay! Now let’s list the members…​</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; !cluster_members</span><br><span class="line">Listing Known Nodes:</span><br><span class="line">&gt;&gt;&gt; [</span><br><span class="line">    &quot;&quot;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>And if we list the cluster members on the VM we used to start the
+cluster:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; !cluster_members</span><br><span class="line">Listing Known Nodes:</span><br><span class="line">&gt;&gt;&gt; [</span><br><span class="line">    &quot;65fda5a6-8b30-4cf1-926f-6fec0d842461&quot;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>Phew!</p>
+<h2 id="end">End</h2>
+<p>The reason we do not see any nodes on the joiner is because we
+haven’t written any code to send the other known nodes back to a client
+when it joins. We’ll do that next tutorial!</p>
+<p>refer to <a
+target="_blank" rel="noopener" href="https://blog.subnetzero.io/post/building-language-vm-part-31/">building-language-vm</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/31/">https://animenzzzzzz.github.io/pages/build-your-own-vm/31/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/30/" title="Cleanup Time"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Cleanup Time</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/32/" title="More Clustering?!"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">More Clustering?!</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/03/" title="More Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">More Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#intro"><span class="toc-number">1.</span> <span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#the-problem"><span class="toc-number">2.</span> <span class="toc-text">The Problem</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#the-second-problem"><span class="toc-number">3.</span> <span class="toc-text">The Second Problem</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#listing-members"><span class="toc-number">4.</span> <span class="toc-text">Listing Members</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#receiving-the-hello"><span class="toc-number">4.1.</span> <span class="toc-text">Receiving the Hello</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cluster-manager"><span class="toc-number">4.2.</span> <span class="toc-text">Cluster Manager</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#the-fix"><span class="toc-number">4.3.</span> <span class="toc-text">The Fix</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#end"><span class="toc-number">5.</span> <span class="toc-text">End</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

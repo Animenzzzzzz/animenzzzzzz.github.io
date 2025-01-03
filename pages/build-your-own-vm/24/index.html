@@ -1,0 +1,490 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>SSH Server - Part 2 | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Intro So, change of plans. I’ve been fighting with thrussh for hours now trying to get SSH working. The key exchange was failing, and I had no idea why. It turned out that even their example client">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSH Server - Part 2">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/24/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="Intro So, change of plans. I’ve been fighting with thrussh for hours now trying to get SSH working. The key exchange was failing, and I had no idea why. It turned out that even their example client">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2025-01-02T08:36:00.000Z">
+<meta property="article:modified_time" content="2025-01-03T07:36:40.101Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/24/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'SSH Server - Part 2',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-03 15:36:40'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">SSH Server - Part 2</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-02T08:36:00.000Z" title="发表于 2025-01-02 16:36:00">2025-01-02</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-01-03T07:36:40.101Z" title="更新于 2025-01-03 15:36:40">2025-01-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="SSH Server - Part 2"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="intro">Intro</h2>
+<p>So, change of plans. I’ve been fighting with thrussh for hours now
+trying to get SSH working. The key exchange was failing, and I had no
+idea why. It turned out that even their example client/server didn’t
+work when I tried. Despite spending a lot of time going through the
+source, I couldn’t find the cause of the issue. The crate uses futures
+very heavily, which makes the program flow hard to follow, at least for
+me. I’m sure that somewhere in the world there is someone who has no
+problem following futures-based async, but it isn’t me. In light of
+this, I decided to go old school. I’m leaving the previous tutorial part
+up; I think its important to see this aspect of projects as well. Having
+to scrap something that doesn’t work out and pivot to something
+else.</p>
+<p>So what will we do? We’re going to do a simple TCP server that spawns
+an OS thread per connection. The remote access functionality to Iridium
+is not meant to handle hundreds or thousands of users, so this will be
+fine from a performance perspective. The one sticking point is
+encryption. SSH would have let us have encrypted connections. We’ll have
+to implement that on top of the socket server, but we’ll save that for
+another tutorial.</p>
+<h2 id="starting-over">Starting Over</h2>
+<p>We’re going to start from this tag: <a
+target="_blank" rel="noopener" href="https://gitlab.com/subnetzero/iridium/tags/0.0.22">https://gitlab.com/subnetzero/iridium/tags/0.0.22</a>.
+We should have nothing to do with the thrussh crate in our code.</p>
+<h2 id="updating-cli-options">Updating CLI Options</h2>
+<p>First up, let’s add some options to our <code>src/bin/cli.yml</code>.
+The user should be able to enable the remote access feature, specify a
+host to bind to, and a port to bind to.</p>
+<h3 id="binding-hosts-and-ports">Binding, Hosts, and Ports</h3>
+<p>Feel free to skip this section if you know what TCP ports are, and
+what binding to an interface and port means. If you don’t, read on! This
+will give you a quick overview.</p>
+<h3 id="tcp-and-udp">TCP and UDP</h3>
+<p>Most network communication between computers utilize TCP
+(transmission control protocol) or UDP (user datagram protocol).
+Higher-level abstractions build on top of these. HTTP, for example, uses
+TCP underneath. This is a complex topic, so for now, remember these two
+points:</p>
+<ol type="1">
+<li>TCP is a dedicated connection that guarantees in-order delivery of
+data. Think of it as a phone conversation.</li>
+<li>UDP is fire-and-forget. You send a packet to a server and it may or
+may not arrive; you won’t know if it does or not. Think of it as mailing
+a letter.</li>
+</ol>
+<p>TCP is best for our needs.</p>
+<h3 id="interfaces">Interfaces</h3>
+<p>If a server is on a network, it is using an interface. This is the
+piece of the hardware that the network cable plugs into, and its
+abstraction in the operating system. These interfaces have an IP
+Address, which unique identifies that server on the network. They look
+like 192.168.1.10. Each of the 4 fields can range from 0 to 255.</p>
+<blockquote>
+<p>Yes, I know, there is IPv6 and such. We’re going to skip that for
+now.</p>
+</blockquote>
+<p>If you are on a Mac or Linux computer, you can see your interfaces by
+typing <code>ifconfig -a</code>. An example is:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">en0: flags=8863&lt;UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST&gt; mtu 1500</span><br><span class="line">    ether 8c:85:90:7a:53:04</span><br><span class="line">    inet6 fe80::462:3eb0:435b:7753%en0 prefixlen 64 secured scopeid 0x8</span><br><span class="line">    inet 192.168.1.34 netmask 0xffffff00 broadcast 192.168.1.255</span><br><span class="line">    nd6 options=201&lt;PERFORMNUD,DAD&gt;</span><br><span class="line">    media: autoselect</span><br><span class="line">    status: active</span><br></pre></td></tr></table></figure>
+<p>The interface name is <code>en0</code>, and its IP Address is
+<code>192.168.1.34</code>.</p>
+<h3 id="ports">Ports</h3>
+<p>Linux servers have a range of ports that programs can bind to. These
+range from 1 to 65535. Think of these as phone extensions. Ports between
+1 and 1024 are reserved for use by the OS, and only the root user can
+bind to those. Ports above that can be used by your program.</p>
+<h3 id="binding">Binding</h3>
+<p>A program can bind to a combination of and interface and port. For
+example, HTTP servers bind to port 80. HTTPS binds to port 443. Once a
+program has done that, external programs can reach it across the
+network. When you send a request to a different machine across a
+network, the destination IP and port number are included. The OS then
+knows how to route that message to the programs listening on that
+interface and port.</p>
+<h2 id="back-to-cli-options">Back to CLI Options</h2>
+<p>The user needs to be able to specify the interface and port Iridium
+should listen on. We add those like so:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">ENABLE_REMOTE_ACCESS:</span></span><br><span class="line">    <span class="attr">help:</span> <span class="string">Enables</span> <span class="string">the</span> <span class="string">remote</span> <span class="string">server</span> <span class="string">component</span> <span class="string">of</span> <span class="string">Iridium</span> <span class="string">VM</span></span><br><span class="line">    <span class="attr">required:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">takes_value:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">long:</span> <span class="string">enable-remote-access</span></span><br><span class="line">    <span class="attr">short:</span> <span class="string">r</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">LISTEN_PORT:</span></span><br><span class="line">    <span class="attr">help:</span> <span class="string">Which</span> <span class="string">port</span> <span class="string">Iridium</span> <span class="string">should</span> <span class="string">listen</span> <span class="string">for</span> <span class="string">remote</span> <span class="string">connections</span> <span class="string">on.</span> <span class="string">Defaults</span> <span class="string">to</span> <span class="number">2244</span><span class="string">.</span></span><br><span class="line">    <span class="attr">required:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">takes_value:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">long:</span> <span class="string">bind-port</span></span><br><span class="line">    <span class="attr">short:</span> <span class="string">p</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">LISTEN_HOST:</span></span><br><span class="line">    <span class="attr">help:</span> <span class="string">Which</span> <span class="string">address</span> <span class="string">Iridium</span> <span class="string">should</span> <span class="string">listen</span> <span class="string">for</span> <span class="string">remote</span> <span class="string">connections</span> <span class="string">on.</span> <span class="string">Defaults</span> <span class="string">to</span> <span class="string">&quot;127.0.0.1&quot;</span><span class="string">.</span></span><br><span class="line">    <span class="attr">required:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">takes_value:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">long:</span> <span class="string">bind-host</span></span><br><span class="line">    <span class="attr">short:</span> <span class="string">h</span></span><br></pre></td></tr></table></figure>
+<p>The first option determines if remote access is enabled at all. By
+default, it is not. We want to do our best to be <strong>secure by
+default</strong>.</p>
+<h3 id="parsing-the-options">Parsing the Options</h3>
+<p>The next step is to check if remote access is enabled, and if so,
+what host and port the user wants. Open up
+<code>src/bin/iridium.rs</code> and put this block in:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> matches.<span class="title function_ invoke__">is_present</span>(<span class="string">&quot;ENABLE_REMOTE_ACCESS&quot;</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">port</span> = matches.<span class="title function_ invoke__">value_of</span>(<span class="string">&quot;LISTEN_PORT&quot;</span>).<span class="title function_ invoke__">unwrap_or</span>(<span class="string">&quot;2244&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">host</span> = matches.<span class="title function_ invoke__">value_of</span>(<span class="string">&quot;LISTEN_HOST&quot;</span>).<span class="title function_ invoke__">unwrap_or</span>(<span class="string">&quot;127.0.0.1&quot;</span>);</span><br><span class="line">    <span class="title function_ invoke__">start_remote_server</span>(host.<span class="title function_ invoke__">to_string</span>(), port.<span class="title function_ invoke__">to_string</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>It has to go below the line that is:
+<code>let matches = App::from_yaml(yaml).get_matches();</code>. What
+this does is:</p>
+<ol type="1">
+<li>Check if the <code>--enable-remote-access</code> flag was passed
+when starting iridium</li>
+<li>Extract the port if provided, or default to 2244 if one was not</li>
+<li>Extract the host if provided, or default to 127.0.0.1 if one was
+not</li>
+<li>Call the function that starts the remote listener in a background
+thread</li>
+</ol>
+<blockquote>
+<p>127.0.0.1 is a special IP address. Every computer that implements
+IPv4 has it. You may hear it referred to as the loopback address, or
+localhost. In fact, if you type ping localhost in a terminal, you should
+see it pinging that IP address. This address refers to the local
+computer only. That means if you bind to 127.0.0.1, you can only access
+it from that same computer. No packets from outside the computer can
+reach 127.0.0.1.</p>
+</blockquote>
+<blockquote>
+<p>There is another special address, 0.0.0.0 which means listen on
+everything possible. If a computer had multiple public IPs, you could
+reach Iridium (or any other program) via any of them.</p>
+</blockquote>
+<blockquote>
+<p>Binding to 127.0.0.1 by default is another security by default
+choice.</p>
+</blockquote>
+<h2 id="starting-the-server">Starting the Server</h2>
+<p>Let’s take a look at the function definition for starting a TCP
+server:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">start_remote_server</span>(listen_host: <span class="type">String</span>, listen_port: <span class="type">String</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">_t</span> = std::thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">sh</span> = iridium::remote::server::Server::<span class="title function_ invoke__">new</span>(listen_host, listen_port);</span><br><span class="line">        sh.<span class="title function_ invoke__">listen</span>();</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>There’s a few important things to note here:</p>
+<ol type="1">
+<li>We start a separate thread to handle connections. This is so that
+the user can continue to interact with the terminal/CLI version, while
+other users can remote in.</li>
+<li>We create a new Server (we’ll see that next) that is defined in
+another module, passing it our host and port</li>
+<li>We call listen on that server.</li>
+</ol>
+<h3 id="remote-module">Remote Module</h3>
+<p>We’re going to put our logic in a new module,
+<code>src/remote</code>. In it, you’ll need 3 files:
+<code>mod.rs</code>, <code>client.rs</code>, and <code>server.rs</code>.
+<code>mod.rs</code> is simple:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> server;</span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> client;</span><br></pre></td></tr></table></figure>
+<p>=) Let’s take a look at what is in <code>server.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> std::io::BufReader;</span><br><span class="line"><span class="keyword">use</span> std::net::TcpListener;</span><br><span class="line"><span class="keyword">use</span> std::thread;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">Server</span> &#123;</span><br><span class="line">    bind_hostname: <span class="type">String</span>,</span><br><span class="line">    bind_port: <span class="type">String</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>That’s our Server! Not much to it, right? Right now, we store the
+hostname and port, and that’s it. We’ll add more stuff later. Now the
+implementation is a bit more complex:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">impl</span> <span class="title class_">Server</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>(bind_hostname: <span class="type">String</span>, bind_port: <span class="type">String</span>) <span class="punctuation">-&gt;</span> Server &#123;</span><br><span class="line">        Server &#123;</span><br><span class="line">            bind_hostname,</span><br><span class="line">            bind_port,</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">listen</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Initializing TCP server...&quot;</span>);</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">listener</span> = TcpListener::<span class="title function_ invoke__">bind</span>(<span class="keyword">self</span>.bind_hostname.<span class="title function_ invoke__">clone</span>() + <span class="string">&quot;:&quot;</span> + &amp;<span class="keyword">self</span>.bind_port).<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        <span class="keyword">for</span> <span class="variable">stream</span> <span class="keyword">in</span> listener.<span class="title function_ invoke__">incoming</span>() &#123;</span><br><span class="line">            <span class="keyword">let</span> <span class="variable">stream</span> = stream.<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">            thread::<span class="title function_ invoke__">spawn</span>(|| &#123;</span><br><span class="line">                <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">client</span> = Client::<span class="title function_ invoke__">new</span>(stream);</span><br><span class="line">                client.<span class="title function_ invoke__">run</span>();</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The new function is straightforward, so I won’t go over it in detail.
+<code>listen</code> is where the functionality is. Let’s go through it
+line by line:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="variable">listener</span> = TcpListener::<span class="title function_ invoke__">bind</span>(<span class="keyword">self</span>.bind_hostname.<span class="title function_ invoke__">clone</span>() + <span class="string">&quot;:&quot;</span> + &amp;<span class="keyword">self</span>.bind_port).<span class="title function_ invoke__">unwrap</span>();</span><br></pre></td></tr></table></figure>
+<p>This creates the listening socket. When an external user tries to
+connect, this is what they talk to. Notice how we create a string of the
+form "hostname:port". This is the usual way of specifying what host and
+port you want to listen on. Success is not guaranteed. For example, if
+you try to bind to a port that some other program is listening on, it
+will fail. So we will want to remove the unwrap() and handle that more
+gracefully.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> <span class="variable">stream</span> <span class="keyword">in</span> listener.<span class="title function_ invoke__">incoming</span>() &#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>The listening socket has a function <code>incoming</code> that blocks
+until there is a connection attempt. It is an infinite loop. When
+someone does connect, we get a stream object:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="variable">stream</span> = stream.<span class="title function_ invoke__">unwrap</span>();</span><br></pre></td></tr></table></figure>
+<p>This is our "connection" to the client that connected. We can send
+and receive data using it. And finally:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">thread::<span class="title function_ invoke__">spawn</span>(|| &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">client</span> = Client::<span class="title function_ invoke__">new</span>(stream);</span><br><span class="line">    client.<span class="title function_ invoke__">run</span>();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>Whenever a new client connects, we create a new Client struct, and
+call run(). Our listener socket loop is complete, and it goes back to
+waiting for more connections.</p>
+<h3 id="client">Client</h3>
+<p>Let’s look at what is in <code>client.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> std::io::&#123;BufRead, Write, Read&#125;;</span><br><span class="line"><span class="keyword">use</span> std::io::&#123;BufReader, BufWriter&#125;;</span><br><span class="line"><span class="keyword">use</span> std::net::TcpStream;</span><br><span class="line"><span class="keyword">use</span> std::sync::mpsc::&#123;Sender, Receiver&#125;;</span><br><span class="line"><span class="keyword">use</span> std::sync::&#123;mpsc&#125;;</span><br><span class="line"><span class="keyword">use</span> std::thread;</span><br><span class="line"><span class="keyword">use</span> repl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">Client</span> &#123;</span><br><span class="line">    reader: BufReader&lt;TcpStream&gt;,</span><br><span class="line">    writer: BufWriter&lt;TcpStream&gt;,</span><br><span class="line">    raw_stream: TcpStream,</span><br><span class="line">    repl: repl::REPL,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Each of our clients has three copies of the same stream we saw
+earlier in the server, as well as their own REPL. You’re probably
+wondering why we copy the stream. Its so we can wrap them in Rust’s
+BufReader and BufWriter, which allows us to send and receive data at a
+higher abstraction level than bytes. The raw_stream is there so that we
+can create the other two. That will make sense in a minute, I promise.
+=)</p>
+<p>Let’s look at the implementation:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">impl</span> <span class="title class_">Client</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>(stream: TcpStream) <span class="punctuation">-&gt;</span> Client &#123;</span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> Handle this better</span></span><br><span class="line">        <span class="keyword">let</span> <span class="variable">reader</span> = stream.<span class="title function_ invoke__">try_clone</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">writer</span> = stream.<span class="title function_ invoke__">try_clone</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">repl</span> = repl::REPL::<span class="title function_ invoke__">new</span>();</span><br><span class="line"></span><br><span class="line">        Client &#123;</span><br><span class="line">            reader: BufReader::<span class="title function_ invoke__">new</span>(reader),</span><br><span class="line">            writer: BufWriter::<span class="title function_ invoke__">new</span>(writer),</span><br><span class="line">            raw_stream: stream,</span><br><span class="line">            repl: repl</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">        <span class="comment">// more functions...</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>Because we need a reader and writer, we use the stream’s ability to
+clone to create the additional connections. This would be cleaner if
+Rust had self-referential structs (<a
+target="_blank" rel="noopener" href="https://internals.rust-lang.org/t/improving-self-referential-structs/4808">https://internals.rust-lang.org/t/improving-self-referential-structs/4808</a>),
+but it doesn’t yet. The raw stream is kept around in case we need more
+clones for some reason in the future.</p>
+<blockquote>
+<p>These are not really additional network connections. It’s more like
+multiple pointers to the same stream.</p>
+</blockquote>
+<p>There’s a few more functions in <code>client.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">w</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, msg: &amp;<span class="type">str</span>) <span class="punctuation">-&gt;</span> <span class="type">bool</span> &#123;</span><br><span class="line">    <span class="keyword">match</span> <span class="keyword">self</span>.writer.<span class="title function_ invoke__">write_all</span>(msg.<span class="title function_ invoke__">as_bytes</span>()) &#123;</span><br><span class="line">        <span class="title function_ invoke__">Ok</span>(_) =&gt; &#123;</span><br><span class="line">            <span class="keyword">match</span> <span class="keyword">self</span>.writer.<span class="title function_ invoke__">flush</span>() &#123;</span><br><span class="line">                <span class="title function_ invoke__">Ok</span>(_) =&gt; &#123;</span><br><span class="line">                    <span class="literal">true</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">                    <span class="built_in">println!</span>(<span class="string">&quot;Error flushing to client: &#123;&#125;&quot;</span>, e);</span><br><span class="line">                    <span class="literal">false</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;Error writing to client: &#123;&#125;&quot;</span>, e);</span><br><span class="line">            <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This is a general write function. It takes any string, converts it to
+bytes, and uses our BufWriter<TcpStream> to send it to the client. We
+call flush to make sure it gets sent, instead of hanging around for some
+amount of time.</p>
+<p>Next up, we have:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">write_prompt</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) &#123;</span><br><span class="line">    <span class="keyword">self</span>.<span class="title function_ invoke__">w</span>(repl::PROMPT);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Which is just a convenience function to write our
+<code>&gt;&gt;&gt;</code> prompt to the user.</p>
+<h3 id="repl">REPL</h3>
+<p>There’s two more functions in the Client struct, but we’re going to
+hop over to the repl module and look at some changes there first to give
+context. Open up <code>src/repl/mod.rs</code>. You’ll note the addition
+of some static strings:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">static</span> REMOTE_BANNER: &amp;<span class="symbol">&#x27;static</span> <span class="type">str</span> = <span class="string">&quot;Welcome to Iridium! Let&#x27;s be productive!&quot;</span>;</span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">static</span> PROMPT: &amp;<span class="symbol">&#x27;static</span> <span class="type">str</span> = <span class="string">&quot;&gt;&gt;&gt; &quot;</span>;</span><br></pre></td></tr></table></figure>
+<p>These are just for convenience, so we use them in other modules.</p>
+<p>In the REPL struct, we have added two things:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">REPL</span> &#123;</span><br><span class="line">    command_buffer: <span class="type">Vec</span>&lt;<span class="type">String</span>&gt;,</span><br><span class="line">    vm: VM,</span><br><span class="line">    asm: Assembler,</span><br><span class="line">    scheduler: Scheduler,</span><br><span class="line">    <span class="keyword">pub</span> tx_pipe: <span class="type">Option</span>&lt;<span class="type">Box</span>&lt;Sender&lt;<span class="type">String</span>&gt;&gt;&gt;,</span><br><span class="line">    <span class="keyword">pub</span> rx_pipe: <span class="type">Option</span>&lt;<span class="type">Box</span>&lt;Receiver&lt;<span class="type">String</span>&gt;&gt;&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>See <code>tx_pipe</code> and <code>rx_pipe</code>? Those are being
+created in the constructor now:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>() <span class="punctuation">-&gt;</span> REPL &#123;</span><br><span class="line">    <span class="keyword">let</span> (tx, rx): (Sender&lt;<span class="type">String</span>&gt;, Receiver&lt;<span class="type">String</span>&gt;) = mpsc::<span class="title function_ invoke__">channel</span>();</span><br><span class="line">    REPL &#123;</span><br><span class="line">        vm: VM::<span class="title function_ invoke__">new</span>(),</span><br><span class="line">        command_buffer: <span class="built_in">vec!</span>[],</span><br><span class="line">        asm: Assembler::<span class="title function_ invoke__">new</span>(),</span><br><span class="line">        scheduler: Scheduler::<span class="title function_ invoke__">new</span>(),</span><br><span class="line">        tx_pipe: <span class="title function_ invoke__">Some</span>(<span class="type">Box</span>::<span class="title function_ invoke__">new</span>(tx)),</span><br><span class="line">        rx_pipe: <span class="title function_ invoke__">Some</span>(<span class="type">Box</span>::<span class="title function_ invoke__">new</span>(rx))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="channels">Channels</h3>
+<p>These are just normal Rust mpsc channels. Instead of our REPL writing
+directly to stdout via println!, it will write to the tx_pipe. Whatever
+has the rx_pipe end can listen on it for the REPL’s output.</p>
+<p>If you look through the various REPL functions, you’ll see I’ve
+replaced the println! macros with something like this:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">self</span>.<span class="title function_ invoke__">send_message</span>(<span class="built_in">format!</span>(<span class="string">&quot;Please enter the path to the file you wish to load: &quot;</span>));</span><br></pre></td></tr></table></figure>
+<p>There’s two helper functions in the REPL now:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">send_message</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, msg: <span class="type">String</span>) &#123;</span><br><span class="line">    <span class="keyword">match</span> &amp;<span class="keyword">self</span>.tx_pipe &#123;</span><br><span class="line">        <span class="title function_ invoke__">Some</span>(pipe) =&gt; &#123;</span><br><span class="line">            pipe.<span class="title function_ invoke__">send</span>(msg+<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="literal">None</span> =&gt; &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">send_prompt</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) &#123;</span><br><span class="line">    <span class="keyword">match</span> &amp;<span class="keyword">self</span>.tx_pipe &#123;</span><br><span class="line">        <span class="title function_ invoke__">Some</span>(pipe) =&gt; &#123;</span><br><span class="line">            pipe.<span class="title function_ invoke__">send</span>(PROMPT.<span class="title function_ invoke__">to_owned</span>());</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="literal">None</span> =&gt; &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>There’s also a new function called run_single:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run_single</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, buffer: &amp;<span class="type">str</span>) <span class="punctuation">-&gt;</span> <span class="type">Option</span>&lt;<span class="type">String</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> buffer.<span class="title function_ invoke__">starts_with</span>(COMMAND_PREFIX) &#123;</span><br><span class="line">        <span class="keyword">self</span>.<span class="title function_ invoke__">execute_command</span>(&amp;buffer);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">program</span> = <span class="keyword">match</span> <span class="title function_ invoke__">program</span>(<span class="title function_ invoke__">CompleteStr</span>(&amp;buffer)) &#123;</span><br><span class="line">            <span class="title function_ invoke__">Ok</span>((_remainder, program)) =&gt; &#123;</span><br><span class="line">                <span class="title function_ invoke__">Some</span>(program)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">                <span class="keyword">self</span>.<span class="title function_ invoke__">send_message</span>(<span class="built_in">format!</span>(<span class="string">&quot;Unable to parse input: &#123;:?&#125;&quot;</span>, e));</span><br><span class="line">                <span class="keyword">self</span>.<span class="title function_ invoke__">send_prompt</span>();</span><br><span class="line">                <span class="literal">None</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="keyword">match</span> program &#123;</span><br><span class="line">            <span class="title function_ invoke__">Some</span>(p) =&gt; &#123;</span><br><span class="line">                <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">bytes</span> = p.<span class="title function_ invoke__">to_bytes</span>(&amp;<span class="keyword">self</span>.asm.symbols);</span><br><span class="line">                <span class="keyword">self</span>.vm.program.<span class="title function_ invoke__">append</span>(&amp;<span class="keyword">mut</span> bytes);</span><br><span class="line">                <span class="keyword">self</span>.vm.<span class="title function_ invoke__">run_once</span>();</span><br><span class="line">                <span class="literal">None</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="literal">None</span> =&gt; &#123;</span><br><span class="line">                <span class="literal">None</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This is because the older run function uses an infinite loop. If a
+remote client called that, they would never get a response.</p>
+<h3 id="summary-of-the-repl-changes">Summary of the REPL Changes</h3>
+<p>I know that’s a lot of changes to the REPL to absorb, so here is a
+neatly itemized list:</p>
+<ol type="1">
+<li>REPLs now send output over a Rust mpsc channel</li>
+<li>The receiver for that channel can be a remote client</li>
+<li>Remote client input is sent to the run_single function</li>
+</ol>
+<h3 id="back-to-the-client">Back to the Client</h3>
+<p>The last two functions we are going to look at are:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">recv_loop</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">rx</span> = <span class="keyword">self</span>.repl.rx_pipe.<span class="title function_ invoke__">take</span>();</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Make this safer on unwrap</span></span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">writer</span> = <span class="keyword">self</span>.raw_stream.<span class="title function_ invoke__">try_clone</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">t</span> = thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">chan</span> = rx.<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        <span class="keyword">loop</span> &#123;</span><br><span class="line">            <span class="keyword">match</span> chan.<span class="title function_ invoke__">recv</span>() &#123;</span><br><span class="line">                <span class="title function_ invoke__">Ok</span>(msg) =&gt; &#123;</span><br><span class="line">                    writer.<span class="title function_ invoke__">write_all</span>(msg.<span class="title function_ invoke__">as_bytes</span>());</span><br><span class="line">                    writer.<span class="title function_ invoke__">flush</span>();</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;&#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) &#123;</span><br><span class="line">    <span class="keyword">self</span>.<span class="title function_ invoke__">recv_loop</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">buf</span> = <span class="type">String</span>::<span class="title function_ invoke__">new</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">banner</span> = repl::REMOTE_BANNER.<span class="title function_ invoke__">to_owned</span>() + <span class="string">&quot;\n&quot;</span> + repl::PROMPT;</span><br><span class="line">    <span class="keyword">self</span>.<span class="title function_ invoke__">w</span>(&amp;banner);</span><br><span class="line">    <span class="keyword">loop</span> &#123;</span><br><span class="line">        <span class="keyword">match</span> <span class="keyword">self</span>.reader.<span class="title function_ invoke__">read_line</span>(&amp;<span class="keyword">mut</span> buf) &#123;</span><br><span class="line">            <span class="title function_ invoke__">Ok</span>(_) =&gt; &#123;</span><br><span class="line">                buf.<span class="title function_ invoke__">trim_right</span>();</span><br><span class="line">                <span class="keyword">self</span>.repl.<span class="title function_ invoke__">run_single</span>(&amp;buf);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">                <span class="built_in">println!</span>(<span class="string">&quot;Error receiving: &#123;:#?&#125;&quot;</span>, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>When run is called, it calls <code>recv_loop</code>. This takes the
+<code>rx_pipe</code> from the Client’s REPL, spawns a thread, and just
+continually listens for input on it. When input is found (the REPL has
+sent something), we send it to the client.</p>
+<p>The rest of the <code>run</code> function is printing the banner and
+then entering an infinite loop to listen for commands from the remote
+client.</p>
+<h2 id="demonstration">Demonstration</h2>
+<p>Let’s see the remote access in action:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ iridium --enable-remote-access</span><br><span class="line">Initializing TCP server...</span><br><span class="line">&gt;&gt;&gt; Welcome to Iridium! Let<span class="string">&#x27;s be productive!</span></span><br><span class="line"><span class="string">&gt;&gt;&gt;</span></span><br></pre></td></tr></table></figure>
+<p>And in another terminal window:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ telnet localhost 2244</span><br><span class="line">Trying 127.0.0.1...</span><br><span class="line">Connected to localhost.</span><br><span class="line">Escape character is <span class="string">&#x27;^]&#x27;</span>.</span><br><span class="line">Welcome to Iridium! Let<span class="string">&#x27;s be productive!</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; !registers</span></span><br><span class="line"><span class="string">Listing registers and all contents:</span></span><br><span class="line"><span class="string">[</span></span><br><span class="line"><span class="string">    0,</span></span><br><span class="line"><span class="string">        // snip a lot more zeros</span></span><br><span class="line"><span class="string">    0,</span></span><br><span class="line"><span class="string">    0</span></span><br><span class="line"><span class="string">]</span></span><br><span class="line"><span class="string">End of Register Listing</span></span><br><span class="line"><span class="string">&gt;&gt;&gt;</span></span><br></pre></td></tr></table></figure>
+<p>This design can handle many more clients, but it is far from
+efficient due to the number of threads used. We’ll work on improving
+that later.</p>
+<h2 id="security">Security</h2>
+<p>You’ll note that there is no password, no username, nothing. Anything
+sent over the network to the Iridium VM can be ready by anyone that can
+see the network traffic. We’ll need to layer encryption, authentication,
+and authorization on top of this. But this tutorial is already long
+enough. =)</p>
+<h2 id="end">End</h2>
+<p>That’s it for this tutorial! You can find the code as it should be at
+the end of this tutorial here: <a
+target="_blank" rel="noopener" href="https://blog.subnetzero.io/project/iridium-vm/building-language-vm-part-23/">https://blog.subnetzero.io/project/iridium-vm/building-language-vm-part-23/</a>.
+I know there were a lot of changes I glossed over, but we’re getting to
+the point that it isn’t practical to do so. If you have any questions,
+please post in the comments, chat, e-mail, etc. I’m more than happy to
+answer them.</p>
+<p>See you next time!</p>
+<p>refer to <a
+target="_blank" rel="noopener" href="https://blog.subnetzero.io/post/building-language-vm-part-24/">building-language-vm</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/24/">https://animenzzzzzz.github.io/pages/build-your-own-vm/24/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/23/" title="SSH Server - Part 1"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">SSH Server - Part 1</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/25/" title="Extending Palladium - Part 1"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Extending Palladium - Part 1</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/03/" title="More Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">More Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#intro"><span class="toc-number">1.</span> <span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#starting-over"><span class="toc-number">2.</span> <span class="toc-text">Starting Over</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#updating-cli-options"><span class="toc-number">3.</span> <span class="toc-text">Updating CLI Options</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#binding-hosts-and-ports"><span class="toc-number">3.1.</span> <span class="toc-text">Binding, Hosts, and Ports</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tcp-and-udp"><span class="toc-number">3.2.</span> <span class="toc-text">TCP and UDP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#interfaces"><span class="toc-number">3.3.</span> <span class="toc-text">Interfaces</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ports"><span class="toc-number">3.4.</span> <span class="toc-text">Ports</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#binding"><span class="toc-number">3.5.</span> <span class="toc-text">Binding</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#back-to-cli-options"><span class="toc-number">4.</span> <span class="toc-text">Back to CLI Options</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#parsing-the-options"><span class="toc-number">4.1.</span> <span class="toc-text">Parsing the Options</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#starting-the-server"><span class="toc-number">5.</span> <span class="toc-text">Starting the Server</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#remote-module"><span class="toc-number">5.1.</span> <span class="toc-text">Remote Module</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#client"><span class="toc-number">5.2.</span> <span class="toc-text">Client</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#repl"><span class="toc-number">5.3.</span> <span class="toc-text">REPL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#channels"><span class="toc-number">5.4.</span> <span class="toc-text">Channels</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#summary-of-the-repl-changes"><span class="toc-number">5.5.</span> <span class="toc-text">Summary of the REPL Changes</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#back-to-the-client"><span class="toc-number">5.6.</span> <span class="toc-text">Back to the Client</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#demonstration"><span class="toc-number">6.</span> <span class="toc-text">Demonstration</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#security"><span class="toc-number">7.</span> <span class="toc-text">Security</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#end"><span class="toc-number">8.</span> <span class="toc-text">End</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Clustering - Part 1 | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Intro Hello everyone! The delay in tutorials was the result of the website re-work (courtesy of Bitdream), that I hope is less…​awful. In the interim, I did add a few features and fixed some bugs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Clustering - Part 1">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/27/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="Intro Hello everyone! The delay in tutorials was the result of the website re-work (courtesy of Bitdream), that I hope is less…​awful. In the interim, I did add a few features and fixed some bugs">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2025-01-03T03:05:27.000Z">
+<meta property="article:modified_time" content="2025-01-03T07:37:06.046Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/27/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Clustering - Part 1',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-03 15:37:06'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Clustering - Part 1</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-03T03:05:27.000Z" title="发表于 2025-01-03 11:05:27">2025-01-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-01-03T07:37:06.046Z" title="更新于 2025-01-03 15:37:06">2025-01-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Clustering - Part 1"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="intro">Intro</h2>
+<p>Hello everyone! The delay in tutorials was the result of the website
+re-work (courtesy of <a target="_blank" rel="noopener" href="https://bitdream.io/">Bitdream</a>), that
+I hope is less…​awful. In the interim, I did add a few features and fixed
+some bugs which would not have made for exciting tutorials, so you’ll
+want to start this tutorial from the latest master. This tutorial, we’re
+going to get different instances of the VM talking to each other over
+TCP. They won’t do much, but they’ll at least be able to connect.</p>
+<h2 id="why">Why?</h2>
+<p>Good question!</p>
+<h3 id="redundancy">Redundancy</h3>
+<p>If your application is running on more than one physically separate
+server, if one fails, the other can continue to operate. In the case of
+a network of Iridium VMs, making them aware of each other allows for
+intelligent handling of failures.</p>
+<h3 id="scaling">Scaling</h3>
+<p>If you get a traffic spike, more machines running your application
+can be brought up.</p>
+<h3 id="other-stuff">Other Stuff…​</h3>
+<p>There’s a few other cool things I have in mind, but I’m not sure if
+they’ll work yet. So I’ll hold off until later. =)</p>
+<h2 id="how">How?</h2>
+<p>The same way we added multi-user support! We’ll open TCP channels
+between the node members.</p>
+<h2 id="cluster-design">Cluster Design</h2>
+<p>This is where it gets a bit more complicated. Distributed computing
+is a hard problem, and there are many ways to do it. Current buzzwords
+in the industry include:</p>
+<ol type="1">
+<li>Raft</li>
+<li>Paxos</li>
+<li>Leaderless</li>
+<li>Consistent hashing</li>
+</ol>
+<p>A lot of the issues in distributed systems arise from building
+distributed database systems. Since that isn’t what we’re building, we
+have less to worry about. Plus, we have the Erlang BEAM VM design we can
+just steal! Which is kind of handy.</p>
+<h2 id="terminology">Terminology</h2>
+<p>Before we get started, let’s define some terms.</p>
+<ol type="1">
+<li>A <code>Node</code> is a running Iridium VM</li>
+<li>A <code>Host</code> is a physical or virtual server running Linux or
+some other OS</li>
+<li>A <code>Cluster</code> is a collection of <code>Nodes</code> that
+can talk to each other over some shared network</li>
+<li>A <code>Topology</code> is how a cluster is connected together. Are
+all nodes connected to all other nodes? Are there proxy nodes?</li>
+</ol>
+<blockquote>
+<p>A <code>Host</code> can run more than one <code>Node</code>.</p>
+</blockquote>
+<h2 id="naming-a-node">Naming a Node</h2>
+<p>We need to be able to unique identify each node within a cluster.
+That is, we don’t want two nodes named <code>Murgatroyd</code>. This
+uniqueness is important because we are going to be able to pass
+<code>Messages</code> between nodes, and part of that is being able to
+unique identify that node.</p>
+<h3 id="generating-ids">Generating IDs</h3>
+<p>One option is to just use random UUIDs. In fact, we added a field for
+a UUID in the VM struct awhile back, and are populating it with a random
+UUID. If we are ok with that, then we’re already done with this
+step!</p>
+<h3 id="specific-ids">Specific IDs</h3>
+<p>While UUIDs are cool, they can be, uh, difficult to remember. It
+would be nice to provide a CLI flag to specify the Node ID. The issue
+with this is that someone could give an entirely different Iridium VM
+the same name. This isn’t good for auditability purposes, and is one of
+the nice things about the current system of generating a random
+UUID.</p>
+<h2 id="aliases">Aliases</h2>
+<p>So what we need are aliases. This is an arbitrary string that a user
+can provide when they start an Iridium VM. If they provide an alias, the
+<code>Node</code> will be addressable by either.</p>
+<p>Open up <code>src/bin/cli.yml</code>, and let’s add an optional
+<code>node-alias</code> flag. Just below the DATA_ROOT_DIR option, we
+can add:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">DATA_ROOT_DIR:</span></span><br><span class="line">    <span class="attr">help:</span> <span class="string">Root</span> <span class="string">directory</span> <span class="string">where</span> <span class="string">the</span> <span class="string">Iridium</span> <span class="string">VM</span> <span class="string">should</span> <span class="string">store</span> <span class="string">its</span> <span class="string">data.</span> <span class="string">Defaults</span> <span class="string">to</span> <span class="string">/var/lib/iridium.</span></span><br><span class="line">    <span class="attr">required:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">takes_value:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">long:</span> <span class="string">data-root-dir</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">NODE_ALIAS:</span></span><br><span class="line">    <span class="attr">help:</span> <span class="string">An</span> <span class="string">alias</span> <span class="string">that</span> <span class="string">can</span> <span class="string">be</span> <span class="string">used</span> <span class="string">to</span> <span class="string">refer</span> <span class="string">to</span> <span class="string">a</span> <span class="string">running</span> <span class="string">VM</span> <span class="string">across</span> <span class="string">a</span> <span class="string">network</span></span><br><span class="line">    <span class="attr">required:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">takes_value:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">long:</span> <span class="string">node-alias</span></span><br></pre></td></tr></table></figure>
+<p>And then <code>iridium.rs</code>, we add a check for it:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="variable">alias</span> = matches.<span class="title function_ invoke__">value_of</span>(<span class="string">&quot;NODE_ALIAS&quot;</span>).<span class="title function_ invoke__">unwrap_or</span>(<span class="string">&quot;&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>Then at last, we add the new <code>alias</code> field to the VM
+struct in <code>src/vm.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">VM</span> &#123;</span><br><span class="line">    <span class="comment">/// Array that simulates having hardware registers</span></span><br><span class="line">    <span class="keyword">pub</span> registers: [<span class="type">i32</span>; <span class="number">32</span>],</span><br><span class="line">    <span class="comment">/// Array that simulates having floating point hardware registers</span></span><br><span class="line">    <span class="keyword">pub</span> float_registers: [<span class="type">f64</span>; <span class="number">32</span>],</span><br><span class="line">    <span class="comment">/// Program counter that tracks which byte is being executed</span></span><br><span class="line">    pc: <span class="type">usize</span>,</span><br><span class="line">    <span class="comment">/// The bytecode of the program being run</span></span><br><span class="line">    <span class="keyword">pub</span> program: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;,</span><br><span class="line">    <span class="comment">/// Used for heap memory</span></span><br><span class="line">    heap: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;,</span><br><span class="line">    <span class="comment">/// Used to represent the stack</span></span><br><span class="line">    stack: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;,</span><br><span class="line">    <span class="comment">/// Contains the remainder of modulo division ops</span></span><br><span class="line">    remainder: <span class="type">usize</span>,</span><br><span class="line">    <span class="comment">/// Contains the result of the last comparison operation</span></span><br><span class="line">    equal_flag: <span class="type">bool</span>,</span><br><span class="line">    <span class="comment">/// Loop counter field, used with the `LOOP` instruction</span></span><br><span class="line">    loop_counter: <span class="type">usize</span>,</span><br><span class="line">    <span class="comment">/// Contains the read-only section data</span></span><br><span class="line">    ro_data: <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;,</span><br><span class="line">    <span class="comment">/// Is a unique, randomly generated UUID for identifying this VM</span></span><br><span class="line">    id: Uuid,</span><br><span class="line">    <span class="comment">/// An alias that can be specified by the user and used to refer to the Node</span></span><br><span class="line">    alias: <span class="type">Option</span>&lt;<span class="type">String</span>&gt;,</span><br><span class="line">    <span class="comment">/// Keeps a list of events for a particular VM</span></span><br><span class="line">    events: <span class="type">Vec</span>&lt;VMEvent&gt;,</span><br><span class="line">    <span class="comment">/// Number of logical cores the system reports</span></span><br><span class="line">    <span class="keyword">pub</span> logical_cores: <span class="type">usize</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Let’s use a builder-type function to pass in the alias. In the VM
+implementation, we can add this function:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">with_alias</span>(<span class="keyword">mut</span> <span class="keyword">self</span>, alias: <span class="type">String</span>) <span class="punctuation">-&gt;</span> <span class="keyword">Self</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> alias == <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">        <span class="keyword">self</span>.alias = <span class="title function_ invoke__">Some</span>(alias)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">self</span>.alias = <span class="literal">None</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">self</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And then in the <code>src/bin/iridium.rs</code> file, where we
+instantiate a VM, we can do this:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="variable">alias</span> = matches.<span class="title function_ invoke__">value_of</span>(<span class="string">&quot;NODE_ALIAS&quot;</span>).<span class="title function_ invoke__">unwrap_or</span>(<span class="string">&quot;&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>That takes care of the aliasing part! Let’s move on to the networking
+part. Let’s add another builder-style function to the VM struct.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">with_cluster_bind</span>(<span class="keyword">mut</span> <span class="keyword">self</span>, server_addr: <span class="type">String</span>, server_port: <span class="type">String</span>) <span class="punctuation">-&gt;</span> <span class="keyword">Self</span> &#123;</span><br><span class="line">    <span class="keyword">self</span>.server_addr = <span class="title function_ invoke__">Some</span>(server_addr);</span><br><span class="line">    <span class="keyword">self</span>.server_port = <span class="title function_ invoke__">Some</span>(server_port);</span><br><span class="line">    <span class="keyword">self</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This will set the fields up with the strings we got from the CLI, if
+the user passed them.</p>
+<h2 id="server-to-server">Server to Server</h2>
+<p>This is not much different from how we did the multi-user REPLs. We
+do not want to use the same socket, as this will be for dedicated
+server-to-server communications. So let’s add in the ability to specify
+an address and port for server-to-server communications.</p>
+<p>Let’s add in two more options to <code>cli.yml</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">SERVER_LISTEN_PORT:</span></span><br><span class="line">    <span class="attr">help:</span> <span class="string">Which</span> <span class="string">port</span> <span class="string">Iridium</span> <span class="string">should</span> <span class="string">listen</span> <span class="string">for</span> <span class="string">remote</span> <span class="string">connections</span> <span class="string">on</span> <span class="string">from</span> <span class="string">other</span> <span class="string">Iridium</span> <span class="string">VMs.</span> <span class="string">Defaults</span> <span class="string">to</span> <span class="number">2254</span><span class="string">.</span></span><br><span class="line">    <span class="attr">required:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">takes_value:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">long:</span> <span class="string">server-bind-port</span></span><br><span class="line">    <span class="attr">short:</span> <span class="string">P</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">SERVER_LISTEN_HOST:</span></span><br><span class="line">    <span class="attr">help:</span> <span class="string">Which</span> <span class="string">address</span> <span class="string">Iridium</span> <span class="string">should</span> <span class="string">listen</span> <span class="string">for</span> <span class="string">remote</span> <span class="string">connections</span> <span class="string">on</span> <span class="string">from</span> <span class="string">other</span> <span class="string">Iridium</span> <span class="string">VMs.</span> <span class="string">Defaults</span> <span class="string">to</span> <span class="string">&quot;127.0.0.1&quot;</span><span class="string">.</span></span><br><span class="line">    <span class="attr">required:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">takes_value:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">long:</span> <span class="string">server-bind-host</span></span><br><span class="line">    <span class="attr">short:</span> <span class="string">H</span></span><br></pre></td></tr></table></figure>
+<p>Then get their values in <code>iridium.rs</code>:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="variable">server_addr</span> = matches.<span class="title function_ invoke__">value_of</span>(<span class="string">&quot;SERVER_LISTEN_HOST&quot;</span>).<span class="title function_ invoke__">unwrap_or</span>(<span class="string">&quot;127.0.0.1&quot;</span>);</span><br><span class="line"><span class="keyword">let</span> <span class="variable">server_port</span> = matches.<span class="title function_ invoke__">value_of</span>(<span class="string">&quot;SERVER_LISTEN_PORT&quot;</span>).<span class="title function_ invoke__">unwrap_or</span>(<span class="string">&quot;2254&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>And, of course, we’ll need to add yet more fields to the VM. =)</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Server address that the VM will bind to for server-to-server communications</span></span><br><span class="line">server_addr: <span class="type">Option</span>&lt;<span class="type">String</span>&gt;,</span><br><span class="line"><span class="comment">// Port the server will bind to for server-to-server communications</span></span><br><span class="line">server_port: <span class="type">Option</span>&lt;<span class="type">String</span>&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="vm-instantiation-change">VM Instantiation Change</h2>
+<p>To make things a bit cleaner and easier for a VM to bind to a socket,
+we need to change this:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">vm</span> = VM::<span class="title function_ invoke__">new</span>();</span><br></pre></td></tr></table></figure>
+<p>to:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">vm</span> = VM::<span class="title function_ invoke__">new</span>().<span class="title function_ invoke__">with_alias</span>(alias.<span class="title function_ invoke__">to_string</span>()).<span class="title function_ invoke__">with_cluster_bind</span>(server_addr.<span class="title function_ invoke__">into</span>(), server_port.<span class="title function_ invoke__">into</span>());</span><br></pre></td></tr></table></figure>
+<p>in two places. One is where we invoke the VM with an INPUT_FILE
+(around like 64 in iridium.rs) and the other is where we create a VM for
+use with the REPL, around like 83. This is a minor refactor to make our
+lives a bit easier.</p>
+<h2 id="repl-change">REPL Change</h2>
+<p>The second one is also requires us to make a small change to the
+REPL:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">repl</span> = REPL::<span class="title function_ invoke__">new</span>(vm);</span><br></pre></td></tr></table></figure>
+<p>We now want to pass a VM instance in. In <code>repl.rs</code>, that
+means we need to change the signature to:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>(vm: VM) <span class="punctuation">-&gt;</span> REPL</span><br></pre></td></tr></table></figure>
+<h2 id="yay-more-threading">Yay, More Threading!</h2>
+<p>Yes, we’re going to use threading for this. This has a tradeoff,
+though. We’re also going to use a full-mesh network.</p>
+<h3 id="full-mesh-network">Full-Mesh Network</h3>
+<p>If we have a cluster of 5 <code>Nodes</code>, there’s a lot of
+different <code>Topologies</code> we can have.</p>
+<h4 id="ring">Ring</h4>
+<p>In this topology, the node connections would look like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A -&gt; B -&gt; C -&gt; D -&gt; E -&gt; A</span><br></pre></td></tr></table></figure>
+<p>Each <code>Node</code> is connected to two other <code>Nodes</code>.
+If we lose one node, we still have a path between the remaining nodes,
+but it is less optimal.</p>
+<h4 id="full-mesh">Full Mesh</h4>
+<p>A full mesh topology would look like:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">A -&gt; (B, C, D, E)</span><br><span class="line">B -&gt; (A, C, D, E)</span><br><span class="line">C -&gt; (D, A, B, E)</span><br><span class="line">D -&gt; (A, B, C, E)</span><br><span class="line">E -&gt; (A, B, C, D)</span><br></pre></td></tr></table></figure>
+<p>Each node is connected to every other node. This has the advantage of
+being very resilient, but it is also expensive. As the number of nodes
+grows, the number of needed connections on each node goes up. It is
+O(N!), where N is the number of <code>Nodes</code>. So not great.</p>
+<p>For now, though, it will serve our purposes, and we can optimize it
+with various techniques, such as using a partial-mesh network, later
+on.</p>
+<h4 id="transitivity">Transitivity</h4>
+<p>Suppose we have a 3 <code>Node</code> cluster, A B and C. If
+<code>A → C</code>, A and C will also connect to B. Or, put another way,
+whenever a new node joins the cluster, it will get a list of all nodes
+of the cluster, and connect to them.</p>
+<h2 id="implementation">Implementation</h2>
+<p>OK, let’s implement this. First up, we need:</p>
+<ol type="1">
+<li>A background thread that listens for connections</li>
+<li>Something that watches for topology changes (nodes entering/leaving
+the cluster) and responds appropriately</li>
+</ol>
+<p>Let’s start with…​=== Listening Socket We’ve done this before, so it’s
+a good starting point. Let’s do it in a new module called
+<code>cluster</code>. In <code>src/</code> make <code>cluster/</code>,
+and in there make three files: <code>mod.rs</code>,
+<code>client.rs</code>, and <code>server.rs</code>. Let’s start on the
+server side.</p>
+<h3 id="server">Server</h3>
+<p>This is quite simple, and very similar to the
+<code>remote/server.rs</code> code:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> std::net::&#123;TcpListener, SocketAddr&#125;;</span><br><span class="line"><span class="keyword">use</span> std::thread;</span><br><span class="line"><span class="keyword">use</span> cluster::client::ClusterClient;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">listen</span>(addr: SocketAddr) &#123;</span><br><span class="line">    info!(<span class="string">&quot;Initializing Cluster server...&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">listener</span> =</span><br><span class="line">        TcpListener::<span class="title function_ invoke__">bind</span>(addr).<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">for</span> <span class="variable">stream</span> <span class="keyword">in</span> listener.<span class="title function_ invoke__">incoming</span>() &#123;</span><br><span class="line">        info!(<span class="string">&quot;New Node connected!&quot;</span>);</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">stream</span> = stream.<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        thread::<span class="title function_ invoke__">spawn</span>(|| &#123;</span><br><span class="line">            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">client</span> = ClusterClient::<span class="title function_ invoke__">new</span>(stream);</span><br><span class="line">            client.<span class="title function_ invoke__">run</span>();</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>We create a listener and start listening for connections. When a new
+client (Iridium VM in this case) connects, we spawn a new thread, start
+the cluster client up, and go back to listening.</p>
+<h3 id="client">Client</h3>
+<p>This one is a bit longer, so I’m going to make comments in the code
+itself to explain what is going on.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> std::io::&#123;BufRead, Write&#125;;</span><br><span class="line"><span class="keyword">use</span> std::io::&#123;BufReader, BufWriter&#125;;</span><br><span class="line"><span class="keyword">use</span> std::net::TcpStream;</span><br><span class="line"><span class="keyword">use</span> std::thread;</span><br><span class="line"><span class="keyword">use</span> std::sync::mpsc::channel;</span><br><span class="line"><span class="keyword">use</span> std::sync::mpsc::&#123;Receiver, Sender&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// This represents another Iridium VM that has joined this server. On their end, we would be the ClusterClient.</span></span><br><span class="line"><span class="comment">/// The main difference between this and `Client` is that we don&#x27;t create a `REPL`, as we don&#x27;t need one.</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">ClusterClient</span> &#123;</span><br><span class="line">    <span class="comment">// Wrap the stream in a BufReader to make it easier to read</span></span><br><span class="line">    reader: BufReader&lt;TcpStream&gt;,</span><br><span class="line">    <span class="comment">// Wrap the stream in a BufWriter to make it easier to write</span></span><br><span class="line">    writer: BufWriter&lt;TcpStream&gt;,</span><br><span class="line">    <span class="comment">// These are standard mpsc channels.</span></span><br><span class="line">    <span class="comment">// We&#x27;ll start a thread that watches for messages coming in on on this channel from other parts of *our* application</span></span><br><span class="line">    <span class="comment">// to be sent out to the ClusterClient</span></span><br><span class="line">    rx: <span class="type">Option</span>&lt;Receiver&lt;<span class="type">String</span>&gt;&gt;,</span><br><span class="line">    <span class="comment">//If something wants to send something to this client, they can clone the `tx` channel.</span></span><br><span class="line">    tx: <span class="type">Option</span>&lt;Sender&lt;<span class="type">String</span>&gt;&gt;,</span><br><span class="line">    raw_stream: TcpStream,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">ClusterClient</span> &#123;</span><br><span class="line">    <span class="comment">/// Creates and returns a new ClusterClient that sets up the stream clones and mpsc channels</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>(stream: TcpStream) <span class="punctuation">-&gt;</span> ClusterClient &#123;</span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> Handle this better</span></span><br><span class="line">        <span class="keyword">let</span> <span class="variable">reader</span> = stream.<span class="title function_ invoke__">try_clone</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">writer</span> = stream.<span class="title function_ invoke__">try_clone</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        <span class="keyword">let</span> (tx, rx) = <span class="title function_ invoke__">channel</span>();</span><br><span class="line">        ClusterClient &#123;</span><br><span class="line">            reader: BufReader::<span class="title function_ invoke__">new</span>(reader),</span><br><span class="line">            writer: BufWriter::<span class="title function_ invoke__">new</span>(writer),</span><br><span class="line">            raw_stream: stream,</span><br><span class="line">            tx: <span class="title function_ invoke__">Some</span>(tx),</span><br><span class="line">            rx: <span class="title function_ invoke__">Some</span>(rx)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Writes a message as bytes to the connected ClusterClient</span></span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">w</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, msg: &amp;<span class="type">str</span>) <span class="punctuation">-&gt;</span> <span class="type">bool</span> &#123;</span><br><span class="line">        <span class="keyword">match</span> <span class="keyword">self</span>.writer.<span class="title function_ invoke__">write_all</span>(msg.<span class="title function_ invoke__">as_bytes</span>()) &#123;</span><br><span class="line">            <span class="title function_ invoke__">Ok</span>(_) =&gt; <span class="keyword">match</span> <span class="keyword">self</span>.writer.<span class="title function_ invoke__">flush</span>() &#123;</span><br><span class="line">                <span class="title function_ invoke__">Ok</span>(_) =&gt; <span class="literal">true</span>,</span><br><span class="line">                <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">                    <span class="built_in">println!</span>(<span class="string">&quot;Error flushing to client: &#123;&#125;&quot;</span>, e);</span><br><span class="line">                    <span class="literal">false</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">                <span class="built_in">println!</span>(<span class="string">&quot;Error writing to client: &#123;&#125;&quot;</span>, e);</span><br><span class="line">                <span class="literal">false</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// This is a background loop that watches for incoming messages on the mpsc channel. When it receives one, it sends it out to the ClusterClient.</span></span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">recv_loop</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) &#123;</span><br><span class="line">        <span class="comment">// We take the rx channel so that we can move ownership into the thread and loop on it</span></span><br><span class="line">        <span class="keyword">let</span> <span class="variable">chan</span> = <span class="keyword">self</span>.rx.<span class="title function_ invoke__">take</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">writer</span> = <span class="keyword">self</span>.raw_stream.<span class="title function_ invoke__">try_clone</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">_t</span> = thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;</span><br><span class="line">            <span class="keyword">loop</span> &#123;</span><br><span class="line">                <span class="keyword">match</span> chan.<span class="title function_ invoke__">recv</span>() &#123;</span><br><span class="line">                    <span class="title function_ invoke__">Ok</span>(msg) =&gt; &#123;</span><br><span class="line">                        <span class="keyword">match</span> writer.<span class="title function_ invoke__">write_all</span>(msg.<span class="title function_ invoke__">as_bytes</span>()) &#123;</span><br><span class="line">                            <span class="title function_ invoke__">Ok</span>(_) =&gt; &#123;&#125;</span><br><span class="line">                            <span class="title function_ invoke__">Err</span>(_e) =&gt; &#123;&#125;</span><br><span class="line">                        &#125;;</span><br><span class="line">                        <span class="keyword">match</span> writer.<span class="title function_ invoke__">flush</span>() &#123;</span><br><span class="line">                            <span class="title function_ invoke__">Ok</span>(_) =&gt; &#123;&#125;</span><br><span class="line">                            <span class="title function_ invoke__">Err</span>(_e) =&gt; &#123;&#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="title function_ invoke__">Err</span>(_e) =&gt; &#123;&#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/// Main function to call to set up the ClusterClient</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">run</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) &#123;</span><br><span class="line">        <span class="comment">// Starts the recv_loop in a background thread</span></span><br><span class="line">        <span class="keyword">self</span>.<span class="title function_ invoke__">recv_loop</span>();</span><br><span class="line">        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">buf</span> = <span class="type">String</span>::<span class="title function_ invoke__">new</span>();</span><br><span class="line">        <span class="comment">// Loop over the incoming data, waiting for data.</span></span><br><span class="line">        <span class="keyword">loop</span> &#123;</span><br><span class="line">            <span class="keyword">match</span> <span class="keyword">self</span>.reader.<span class="title function_ invoke__">read_line</span>(&amp;<span class="keyword">mut</span> buf) &#123;</span><br><span class="line">                <span class="title function_ invoke__">Ok</span>(_) =&gt; &#123;</span><br><span class="line">                    buf.<span class="title function_ invoke__">trim_right</span>();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="title function_ invoke__">Err</span>(e) =&gt; &#123;</span><br><span class="line">                    <span class="built_in">println!</span>(<span class="string">&quot;Error receiving: &#123;:#?&#125;&quot;</span>, e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Phew! Sorry for the long block of code. To summarize:</p>
+<ol type="1">
+<li>VM starts up</li>
+<li>A thread binds to a TCP socket and listens for incoming
+connections</li>
+<li>New connections are handed off to a new thread, that starts their
+recv loop</li>
+</ol>
+<h2 id="a-new-command">A New Command</h2>
+<p>We don’t yet have a way to start up the cluster. For that, let’s head
+into <code>src/repl/mod.rs</code> and add a new command called
+<code>!start_cluster</code>. I will leave that implementation as a fun
+exercise, but you can reference the source code if you get stuck: <a
+target="_blank" rel="noopener" href="https://gitlab.com/subnetzero/iridium/tags/0.0.27">https://gitlab.com/subnetzero/iridium/tags/0.0.27</a></p>
+<p>In the next tutorial, we’ll work on passing messages between cluster
+members. See you then!</p>
+<p>refer to <a
+target="_blank" rel="noopener" href="https://blog.subnetzero.io/post/building-language-vm-part-27/">building-language-vm</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/27/">https://animenzzzzzz.github.io/pages/build-your-own-vm/27/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/26/" title="Adding Floating Point Support"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Adding Floating Point Support</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/28/" title="Clustering - Part 2"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Clustering - Part 2</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/03/" title="More Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">More Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#intro"><span class="toc-number">1.</span> <span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#why"><span class="toc-number">2.</span> <span class="toc-text">Why?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#redundancy"><span class="toc-number">2.1.</span> <span class="toc-text">Redundancy</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#scaling"><span class="toc-number">2.2.</span> <span class="toc-text">Scaling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#other-stuff"><span class="toc-number">2.3.</span> <span class="toc-text">Other Stuff…​</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#how"><span class="toc-number">3.</span> <span class="toc-text">How?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cluster-design"><span class="toc-number">4.</span> <span class="toc-text">Cluster Design</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#terminology"><span class="toc-number">5.</span> <span class="toc-text">Terminology</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#naming-a-node"><span class="toc-number">6.</span> <span class="toc-text">Naming a Node</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#generating-ids"><span class="toc-number">6.1.</span> <span class="toc-text">Generating IDs</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#specific-ids"><span class="toc-number">6.2.</span> <span class="toc-text">Specific IDs</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#aliases"><span class="toc-number">7.</span> <span class="toc-text">Aliases</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#server-to-server"><span class="toc-number">8.</span> <span class="toc-text">Server to Server</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vm-instantiation-change"><span class="toc-number">9.</span> <span class="toc-text">VM Instantiation Change</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#repl-change"><span class="toc-number">10.</span> <span class="toc-text">REPL Change</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yay-more-threading"><span class="toc-number">11.</span> <span class="toc-text">Yay, More Threading!</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#full-mesh-network"><span class="toc-number">11.1.</span> <span class="toc-text">Full-Mesh Network</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ring"><span class="toc-number">11.1.1.</span> <span class="toc-text">Ring</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#full-mesh"><span class="toc-number">11.1.2.</span> <span class="toc-text">Full Mesh</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#transitivity"><span class="toc-number">11.1.3.</span> <span class="toc-text">Transitivity</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#implementation"><span class="toc-number">12.</span> <span class="toc-text">Implementation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#server"><span class="toc-number">12.1.</span> <span class="toc-text">Server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#client"><span class="toc-number">12.2.</span> <span class="toc-text">Client</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#a-new-command"><span class="toc-number">13.</span> <span class="toc-text">A New Command</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

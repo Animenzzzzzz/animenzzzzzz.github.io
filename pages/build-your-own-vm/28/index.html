@@ -1,0 +1,372 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Clustering - Part 2 | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Intro Hi, me again! In our last tutorial, we had added a separate TCP server to the Iridium VM. In this one, we’re going to finish up the client part, so that two Iridium VMs can talk to one anothe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Clustering - Part 2">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/28/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="Intro Hi, me again! In our last tutorial, we had added a separate TCP server to the Iridium VM. In this one, we’re going to finish up the client part, so that two Iridium VMs can talk to one anothe">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2025-01-03T05:24:40.000Z">
+<meta property="article:modified_time" content="2025-01-03T07:37:12.918Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/28/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Clustering - Part 2',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-03 15:37:12'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Clustering - Part 2</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-03T05:24:40.000Z" title="发表于 2025-01-03 13:24:40">2025-01-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-01-03T07:37:12.918Z" title="更新于 2025-01-03 15:37:12">2025-01-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Clustering - Part 2"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="intro">Intro</h2>
+<p>Hi, me again! In our last tutorial, we had added a separate TCP
+server to the Iridium VM. In this one, we’re going to finish up the
+client part, so that two Iridium VMs can talk to one another. Make sure
+you start this tutorial from this tag: <a
+target="_blank" rel="noopener" href="https://gitlab.com/subnetzero/iridium/tags/0.0.27">https://gitlab.com/subnetzero/iridium/tags/0.0.27</a></p>
+<blockquote>
+<p>The code at the end of this is not working. We still have one more
+tutorial to do!</p>
+</blockquote>
+<h2 id="join-cluster-command">Join Cluster Command</h2>
+<p>For this tutorial, let’s add some variation to our lives and start by
+making the command to join a cluster. Right now, there is a
+<code>!start_cluster</code> command. Let’s add a
+<code>!join_cluster</code> command.</p>
+<h3 id="repl">REPL</h3>
+<p>This is only a few steps:</p>
+<ol type="1">
+<li>In <code>src/repl/mod.rs</code>, find the function called
+<code>execute_command</code>, and add <code>!start_cluster</code> to it.
+Something like:
+<code>"!join_cluster" ⇒ self.join_cluster(&amp;args[1..]),</code></li>
+<li>Make a stub function at the end</li>
+</ol>
+<p>The stub function should look like:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">join_cluster</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, _args: &amp;[&amp;<span class="type">str</span>]) &#123;</span><br><span class="line">    debug!(<span class="string">&quot;Attempting to join cluster...&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>We’ll add along the way, of course.</p>
+<h3 id="cluster-module">Cluster Module</h3>
+<p>Since we are doing a full-mesh, every node is a server, and it
+connects as a client to every other node. This implies a few things:</p>
+<ol type="1">
+<li>We need to keep a list of all known nodes</li>
+<li>We need to track the network connectivity to all our connected
+nodes</li>
+<li>We need to keep the list of nodes in sync across all nodes</li>
+</ol>
+<blockquote>
+<p>This is where we get to start doing some cool distributed systems
+stuff. =)</p>
+</blockquote>
+<h3 id="a-bit-of-setup">A Bit of Setup</h3>
+<ol type="1">
+<li>Make the directory <code>src/cluster</code> if you haven’t
+already</li>
+<li>Create an empty file <code>client.rs</code></li>
+<li>Create an empty file <code>server.rs</code></li>
+<li>Create an empty file <code>mod.rs</code></li>
+<li>Create an empty file named <code>manager.rs</code></li>
+</ol>
+<p>In the <code>mod.rs</code> file, put:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> server;</span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> client;</span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> manager;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">NodeAlias</span> = <span class="type">String</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="list-of-nodes">List of Nodes</h3>
+<p>Let’s start here. We can make a simple Manager struct that handles
+this for us. It will have the responsibility of tracking each connected
+client, adding new ones, and removing dead ones. Create
+<code>src/cluster/manager.rs</code>, and put the following in it. Since
+its a larger chunk, I’ll explain in comments in the code.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> std::collections::HashMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> cluster::client::ClusterClient;</span><br><span class="line"><span class="keyword">use</span> cluster::NodeAlias;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Basic struct declaration. Right now, it has a simple HashMap of ClusterClients mapped by their NodeAlias</span></span><br><span class="line"><span class="comment">// Remember: NodeAlias is just a type alias for String.</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">Manager</span> &#123;</span><br><span class="line">    clients: HashMap&lt;NodeAlias, ClusterClient&gt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">Manager</span> &#123;</span><br><span class="line">    <span class="comment">/// Basic constructor for the Manager</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>() <span class="punctuation">-&gt;</span> Manager &#123;</span><br><span class="line">        Manager &#123;</span><br><span class="line">            clients: HashMap::<span class="title function_ invoke__">new</span>()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/// Adds a client, which will be another cluster member. We should really return something other than a boolean,</span></span><br><span class="line">    <span class="comment">/// but we&#x27;ll have to revisit that when we redo how we handle errors.</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">add_client</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, alias: NodeAlias, client: ClusterClient) <span class="punctuation">-&gt;</span> <span class="type">bool</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">self</span>.clients.<span class="title function_ invoke__">contains_key</span>(&amp;alias) &#123;</span><br><span class="line">            error!(<span class="string">&quot;Tried to add a client that already existed&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">self</span>.clients.<span class="title function_ invoke__">insert</span>(alias, client);</span><br><span class="line">        <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/// Delete a client by alias. Same story with the bool as above.</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">del_client</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, alias: NodeAlias) <span class="punctuation">-&gt;</span> <span class="type">bool</span> &#123;</span><br><span class="line">        <span class="keyword">self</span>.clients.<span class="title function_ invoke__">remove</span>(&amp;alias);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// And of course some tests</span></span><br><span class="line"><span class="meta">#[cfg(test)]</span></span><br><span class="line"><span class="keyword">mod</span> test &#123;</span><br><span class="line">    <span class="keyword">use</span> super::Manager;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">test_create_manager</span>() &#123;</span><br><span class="line">        <span class="keyword">let</span> <span class="variable">test_manager</span> = Manager::<span class="title function_ invoke__">new</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="messages">Messages</h2>
+<p>This is where things start to get tricky. We need a protocol to
+communicate back and forth between cluster members. All we can send are
+0s and 1s. How is the receiver supposed to know where in that stream the
+node alias is, for example? A protocol let’s us define these things.</p>
+<h3 id="making-a-protocol">Making a Protocol</h3>
+<p>There’s a ton of already existing protocols. JSON is one. Protobuf.
+Flatbuf. We could also make up our own.</p>
+<p>As an example, we could say that the first 64 bytes are the node
+alias. This has a few repercussions:</p>
+<ol type="1">
+<li>Node aliases can only be 64 bytes or less</li>
+<li>We potentially waste space if the node alias is less than 64
+bytes</li>
+</ol>
+<h3 id="but...">But...</h3>
+<p>I started implementing this part with Cap’n Proto, but in the end, I
+think it is too complex for a tutorial. So let’s do this a different
+way: JSON! But first, let’s go over the process of forming and joining a
+cluster</p>
+<h3 id="forming-a-cluster">Forming a Cluster</h3>
+<p>One node has to bootstrap the cluster. Right now, that means running
+!start_cluster. Later on, we’ll do this with CLI flags or env vars.
+Starting a cluster binds that particular Iridium VM process to a
+specific port, and it begins listening for data.</p>
+<p>We now have a cluster. A cluster of 1, but still.</p>
+<h3 id="joining-a-cluster">Joining a Cluster</h3>
+<p>Now we can start a second Iridium VM, and use the !join_cluster with
+the arguments of the bootstrap node’s ip and port. It will connect. Now,
+a few things have to happen here. Think of it has a handshake, or the
+nodes introducing themselves to each other. If our nodes are called A
+and B, it would go something like:</p>
+<p>B: "Hello A! My name is B!" A: "Hello B! My name is A! Here are all
+the other nodes I know about in this cluster!"</p>
+<p>Of course, if we add in encryption, authentication, authorization,
+that interaction grows quite a bit more complicated. For the rest of
+this tutorial, let’s get this working.</p>
+<h3 id="messages-1">Messages</h3>
+<p>We’ll represent each different message type using enums:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">enum</span> <span class="title class_">IridiumMessage</span> &#123;</span><br><span class="line">  Hello&#123;alias: <span class="type">String</span>&#125;,</span><br><span class="line">  HelloAck&#123;alias: <span class="type">String</span>, nodes: <span class="type">Vec</span>&lt;(<span class="type">String</span>, <span class="type">String</span>, <span class="type">String</span>)&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The <code>Hello</code> contains the node alias of the node that wants
+to join the cluster. <code>HelloAck</code> responds with its own alias,
+and a list of all the nodes, their IPs, and ports. Our joiner will then
+need to go through each of those nodes, and introduce itself to them.
+But for now, let’s get the joiner making and sending a
+<code>Hello</code>.</p>
+<p>Go ahead and open up <code>src/cluster/message.rs</code> and in it
+put:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">enum</span> <span class="title class_">IridiumMessage</span>&#123;</span><br><span class="line">    Hello&#123;alias: <span class="type">String</span>&#125;,</span><br><span class="line">    HelloAck&#123;alias: <span class="type">String</span>, nodes: <span class="type">Vec</span>&lt;(<span class="type">String</span>, <span class="type">String</span>, <span class="type">String</span>)&gt;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And don’t forget to add a <code>pub mod message;</code> in
+<code>mod.rs</code>.</p>
+<h3 id="the-client">The Client</h3>
+<p>Open up <code>src/cluster/client.rs</code>. To the ClusterClient
+impl, add the following function:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">send_hello</span>(&amp;<span class="keyword">self</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">msg</span> = IridiumMessage&#123;alias: ....&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Crap. We don’t have the alias stored in the TcpClient. So let’s add a
+field to the struct:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">ClusterClient</span> &#123;</span><br><span class="line">    alias: <span class="type">String</span>,</span><br><span class="line">    reader: BufReader&lt;TcpStream&gt;,</span><br><span class="line">    writer: BufWriter&lt;TcpStream&gt;,</span><br><span class="line">    rx: <span class="type">Option</span>&lt;Receiver&lt;<span class="type">String</span>&gt;&gt;,</span><br><span class="line">    tx: <span class="type">Option</span>&lt;Sender&lt;<span class="type">String</span>&gt;&gt;,</span><br><span class="line">    raw_stream: TcpStream,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And then in the <code>impl</code>, we need to change the
+<code>new</code> function up:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>(stream: TcpStream, alias: <span class="type">String</span>) <span class="punctuation">-&gt;</span> ClusterClient &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Handle this better</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">reader</span> = stream.<span class="title function_ invoke__">try_clone</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">writer</span> = stream.<span class="title function_ invoke__">try_clone</span>().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">    <span class="keyword">let</span> (tx, rx) = <span class="title function_ invoke__">channel</span>();</span><br><span class="line">    ClusterClient &#123;</span><br><span class="line">        reader: BufReader::<span class="title function_ invoke__">new</span>(reader),</span><br><span class="line">        writer: BufWriter::<span class="title function_ invoke__">new</span>(writer),</span><br><span class="line">        raw_stream: stream,</span><br><span class="line">        tx: <span class="title function_ invoke__">Some</span>(tx),</span><br><span class="line">        rx: <span class="title function_ invoke__">Some</span>(rx),</span><br><span class="line">        alias: alias,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Now let’s head over to <code>repl/mod.rs</code>, and down to the
+<code>join_cluster</code> method. I’ve commented the code inline.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">join_cluster</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, args: &amp;[&amp;<span class="type">str</span>]) &#123;</span><br><span class="line">  <span class="keyword">self</span>.<span class="title function_ invoke__">send_message</span>(<span class="built_in">format!</span>(<span class="string">&quot;Attempting to join cluster...&quot;</span>));</span><br><span class="line">  <span class="comment">// Extract the IP and Port arguments passed in</span></span><br><span class="line">  <span class="keyword">let</span> <span class="variable">ip</span> = args[<span class="number">0</span>];</span><br><span class="line">  <span class="keyword">let</span> <span class="variable">port</span> = args[<span class="number">1</span>];</span><br><span class="line">  <span class="comment">// Convert them to a form we can use as a SocketAddr</span></span><br><span class="line">  <span class="keyword">let</span> <span class="variable">addr</span> = (ip.<span class="title function_ invoke__">to_owned</span>() + <span class="string">&quot;:&quot;</span> + port);</span><br><span class="line">  <span class="comment">// Attempt to make the actual connection</span></span><br><span class="line">  <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Ok</span>(stream) = TcpStream::<span class="title function_ invoke__">connect</span>(addr) &#123;</span><br><span class="line">      <span class="keyword">self</span>.<span class="title function_ invoke__">send_message</span>(<span class="built_in">format!</span>(<span class="string">&quot;Connected to cluster!&quot;</span>));</span><br><span class="line">      <span class="comment">// Adds the remote cluster to our list of connected clusters</span></span><br><span class="line">      <span class="keyword">let</span> <span class="variable">cc</span> = cluster::client::ClusterClient::<span class="title function_ invoke__">new</span>(stream);</span><br><span class="line">      <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Some</span>(<span class="keyword">ref</span> a) = <span class="keyword">self</span>.vm.alias &#123;</span><br><span class="line">          <span class="keyword">self</span>.connection_manager.<span class="title function_ invoke__">add_client</span>(a.<span class="title function_ invoke__">to_string</span>(), cc);</span><br><span class="line">      &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">self</span>.<span class="title function_ invoke__">send_message</span>(<span class="built_in">format!</span>(<span class="string">&quot;Could not connect to cluster!&quot;</span>));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="testing">Testing</h3>
+<p>For basic testing, I open a terminal, and split the screen
+vertically. In one, I do this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ iridium --node-alias=node1</span><br><span class="line">Welcome to Iridium! Let&#x27;s be productive!</span><br><span class="line">&gt;&gt;&gt; !start_cluster</span><br><span class="line">Starting cluster server!</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<p>And in the other:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ iridium --node-alias=node2</span><br><span class="line">Welcome to Iridium! Let&#x27;s be productive!</span><br><span class="line">&gt;&gt;&gt; !join_cluster 127.0.0.1 2254</span><br><span class="line">Attempting to join cluster...</span><br><span class="line">Connected to cluster!</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="listing-members">Listing Members</h3>
+<p>Let’s add in a little utility command that lists all the cluster
+members we know about. First, we need to add a function to
+<code>src/cluster/manager.rs</code> to let us get a list of aliases:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">get_client_names</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">Vec</span>&lt;<span class="type">String</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">results</span> = <span class="built_in">vec!</span>[];</span><br><span class="line">    <span class="keyword">for</span> (alias, _) <span class="keyword">in</span> &amp;<span class="keyword">self</span>.clients &#123;</span><br><span class="line">        results.<span class="title function_ invoke__">push</span>(alias.<span class="title function_ invoke__">to_owned</span>());</span><br><span class="line">    &#125;</span><br><span class="line">    results</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>In <code>src/repl/mod.rs</code>, add a command called
+<code>!cluster_members</code>. It should call a function,
+<code>cluster_members</code>, that is:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">cluster_members</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, args: &amp;[&amp;<span class="type">str</span>]) &#123;</span><br><span class="line">    <span class="keyword">self</span>.<span class="title function_ invoke__">send_message</span>(<span class="built_in">format!</span>(<span class="string">&quot;Listing Known Nodes:&quot;</span>));</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">cluster_members</span> = <span class="keyword">self</span>.connection_manager.<span class="title function_ invoke__">get_client_names</span>();</span><br><span class="line">    <span class="keyword">self</span>.<span class="title function_ invoke__">send_message</span>(<span class="built_in">format!</span>(<span class="string">&quot;&#123;:#?&#125;&quot;</span>, cluster_members));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Now if we start two iridium VMs, join them, and list the members, we
+see…​an empty list!</p>
+<h2 id="wrapping-up">Wrapping Up</h2>
+<p>This is a good place to stop, as we’ll need to make some more changes
+to get all this hooked up. But we now have nodes that can join each
+other!</p>
+<p>refer to <a
+target="_blank" rel="noopener" href="https://blog.subnetzero.io/post/building-language-vm-part-28/">building-language-vm</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/28/">https://animenzzzzzz.github.io/pages/build-your-own-vm/28/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/27/" title="Clustering - Part 1"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Clustering - Part 1</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/29/" title="Clustering - Part 3"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Clustering - Part 3</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/03/" title="More Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">More Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#intro"><span class="toc-number">1.</span> <span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#join-cluster-command"><span class="toc-number">2.</span> <span class="toc-text">Join Cluster Command</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#repl"><span class="toc-number">2.1.</span> <span class="toc-text">REPL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cluster-module"><span class="toc-number">2.2.</span> <span class="toc-text">Cluster Module</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#a-bit-of-setup"><span class="toc-number">2.3.</span> <span class="toc-text">A Bit of Setup</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#list-of-nodes"><span class="toc-number">2.4.</span> <span class="toc-text">List of Nodes</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#messages"><span class="toc-number">3.</span> <span class="toc-text">Messages</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#making-a-protocol"><span class="toc-number">3.1.</span> <span class="toc-text">Making a Protocol</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#but..."><span class="toc-number">3.2.</span> <span class="toc-text">But...</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forming-a-cluster"><span class="toc-number">3.3.</span> <span class="toc-text">Forming a Cluster</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#joining-a-cluster"><span class="toc-number">3.4.</span> <span class="toc-text">Joining a Cluster</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#messages-1"><span class="toc-number">3.5.</span> <span class="toc-text">Messages</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#the-client"><span class="toc-number">3.6.</span> <span class="toc-text">The Client</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#testing"><span class="toc-number">3.7.</span> <span class="toc-text">Testing</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#listing-members"><span class="toc-number">3.8.</span> <span class="toc-text">Listing Members</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#wrapping-up"><span class="toc-number">4.</span> <span class="toc-text">Wrapping Up</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

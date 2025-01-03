@@ -1,0 +1,456 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Adding Floating Point Support | My Dearest</title><meta name="author" content="Animenzzzzzz"><meta name="copyright" content="Animenzzzzzz"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Intro Hi everyone! In this tutorial, we’re going to upgrade our VM to support floating point numbers. In the previous tutorial, we added support to the Palladium language, so we kind of need to sup">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Adding Floating Point Support">
+<meta property="og:url" content="https://animenzzzzzz.github.io/pages/build-your-own-vm/26/index.html">
+<meta property="og:site_name" content="My Dearest">
+<meta property="og:description" content="Intro Hi everyone! In this tutorial, we’re going to upgrade our VM to support floating point numbers. In the previous tutorial, we added support to the Palladium language, so we kind of need to sup">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2025-01-03T02:24:54.000Z">
+<meta property="article:modified_time" content="2025-01-03T07:36:56.837Z">
+<meta property="article:author" content="Animenzzzzzz">
+<meta property="article:tag" content="virtual-machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/build-your-own-vm/26/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Adding Floating Point Support',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-03 15:36:56'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Adding Floating Point Support</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-03T02:24:54.000Z" title="发表于 2025-01-03 10:24:54">2025-01-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-01-03T07:36:56.837Z" title="更新于 2025-01-03 15:36:56">2025-01-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/">Computer</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer/Virtual-Machine/">Virtual Machine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Adding Floating Point Support"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="intro">Intro</h2>
+<p>Hi everyone! In this tutorial, we’re going to upgrade our VM to
+support floating point numbers. In the previous tutorial, we added
+support to the Palladium language, so we kind of need to support it in
+the VM as well. =) Before we get to implementation, let’s have a quick
+review of numbers. == Numbers If you already know what a floating point
+number is, feel free to skip this part. If not, read on for a quick
+review.</p>
+<h2 id="integers">Integers</h2>
+<p>These are also known as whole numbers. 1, 2, 3, 4 etc. It also
+includes negative numbers: -1, -2, -3, etc. 0 is also an integer. If we
+look at those numbers in terms of money, we can see a problem…​how do you
+represent $1.50? You can’t, you have either $1 or $2.</p>
+<h2 id="floating-points">Floating Points</h2>
+<p>These have decimal points in them and are used when greater precision
+is needed. We can represent fractions like $1.50.</p>
+<h2 id="cpu-representation">CPU Representation</h2>
+<p>So why don’t we use floats everywhere? Well, we could. In fact, a few
+languages do. So why do most languages distinguish between them? Let’s
+take a look at how an integer is represented inside a computer.</p>
+<p>In binary, every bit is 1 or 0. We group 8 bits into something called
+a byte. We can express integers using this without issue:</p>
+<p><code>[0, 0, 0, 0, 0, 0, 0, 0]</code></p>
+<p>The integer 1 is represented as
+<code>[0, 0, 0, 0, 0, 0, 0, 1]</code>, and so on. This is how our
+decimal system works.</p>
+<blockquote>
+<p>You may be wondering how we would represent negative integers. Good
+question! A common way is to use one bit as the sign bit. In our 8-bit
+example, we could say the left-most bit is our sign bit. If it is 0, the
+number is positive. If it is 1, it is negative. The integer -1 could be
+expressed as: [1, 0, 0, 0, 0, 0, 0, 1]. This is the difference between a
+signed and unsigned number you see in programming languages.</p>
+</blockquote>
+<blockquote>
+<p>Using 8 bits with no sign bit, we can express 2^8, or 0-256. Using 8
+bits with a sign bit, we can express 2^7, both positive and negative. So
+our range becomes -128 to 128.</p>
+</blockquote>
+<p>If we want to represent floating point numbers in binary, we have to
+do more work. I am not going to go into detail on it here, as excellent
+explanations abound online. The summary is that it takes more work for
+the CPU to work with floating point numbers compared to integers.</p>
+<h2 id="registers">Registers</h2>
+<p>OK, on to implementation! Iridium has 32 i32 registers. i32 means
+32-bit integer. We can’t just stuff a 64-bit float in there, now can we?
+We have a couple options here:</p>
+<ol type="1">
+<li>Duplicate the existing register design, but use f64 instead of i32.
+This is similar to a chip manufacturer adding more hardware
+registers.</li>
+<li>Change the existing registers to hold an array of u8s.</li>
+<li>Tinkering with unsafe raw pointers to cast between types.</li>
+</ol>
+<h3 id="option-1">Option 1</h3>
+<p>This has the advantage of simplicity, but it also causes a lot of
+code duplication. Now we need separate instructions for the 64-bit
+registers. And what happens if someone tries to add a 32-bit register to
+a 64-bit register? Do we allow casting between them?</p>
+<h3 id="option-2">Option 2</h3>
+<p>This has the advantage of being a more generic solution, but it also
+would require us to write a lot of code to manage u8s.</p>
+<h3 id="option-3">Option 3</h3>
+<p>One of our primary goals is to not use unsafe rust unless we cannot
+avoid it.</p>
+<h3 id="and-the-winner-is">And the Winner is…​</h3>
+<p>Option 1! It is easiest to code and understand. It will make some
+things a bit more annoying for the user, but we can do some things in
+the parser to help with that.</p>
+<h2 id="implementation">Implementation</h2>
+<p>The summary of steps we’ll need to do for this is:</p>
+<ol type="1">
+<li>Add an array of f64s to the VM</li>
+<li>Add f64-bit versions of the LOAD, ADD, SUB, MUL, DIV and comparison
+operators</li>
+<li>Teach our parser and assembler about them</li>
+</ol>
+<p>Let’s get started!</p>
+<h3 id="add-f64-registers-to-vm">Add f64 Registers to VM</h3>
+<p>This is an easy one. In <code>src/vm.rs</code>, add a field called
+<code>float_registers</code>.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">VM</span> &#123;</span><br><span class="line">    <span class="comment">/// Array that simulates having hardware registers</span></span><br><span class="line">    <span class="keyword">pub</span> registers: [<span class="type">i32</span>; <span class="number">32</span>],</span><br><span class="line">    <span class="comment">/// Array that simulates having floating point hardware registers</span></span><br><span class="line">    <span class="keyword">pub</span> float_registers: [<span class="type">f64</span>; <span class="number">32</span>],</span><br><span class="line">    <span class="comment">/// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Then in the VM constructor, we need to initialize it:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">impl</span> <span class="title class_">VM</span> &#123;</span><br><span class="line">    <span class="comment">/// Creates and returns a new VM</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new</span>() <span class="punctuation">-&gt;</span> VM &#123;</span><br><span class="line">        VM &#123;</span><br><span class="line">            registers: [<span class="number">0</span>; <span class="number">32</span>],</span><br><span class="line">            float_registers: [<span class="number">0.0</span>; <span class="number">32</span>],</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Note the fact that we are defaulting them to <code>0.0</code>. This
+is because they are f64s.</p>
+<h3 id="new-instructions">New Instructions</h3>
+<p>We need to a bunch of new instructions:</p>
+<ol type="1">
+<li>LOADF64</li>
+<li>ADDF64</li>
+<li>SUBF64</li>
+<li>MULF64</li>
+<li>DIVF64</li>
+<li>EQF64</li>
+<li>NEQF64</li>
+<li>GTF64</li>
+<li>GTEF64</li>
+<li>LTF64</li>
+<li>LTEF64</li>
+</ol>
+<p>In <code>src/instructions.rs</code>, add each of those to the list of
+<code>Opcodes</code>, the <code>From&lt;u8&gt;</code> impl, and the
+<code>From&lt;CompleteStr&lt;'a&gt;&gt; for Opcode</code> trait.</p>
+<p>But wait, there’s more!</p>
+<p>We also have to add a match arm for each of the new instructions in
+<code>src/vm.rs</code>. The implementation of the <code>ADDF64</code>
+looks like:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Opcode::ADDF64 =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register1</span> = <span class="keyword">self</span>.float_registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register2</span> = <span class="keyword">self</span>.float_registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">self</span>.float_registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>] = register1 + register2;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<p>Notice how it is the same as the <code>ADD</code> instruction, except
+that we access the float_registers array.</p>
+<h3 id="the-one-gotcha">The One Gotcha</h3>
+<p>Let’s take a look at the <code>EQ</code> opcode for the 32-bit
+instruction:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Opcode::EQ =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register1</span> = <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register2</span> = <span class="keyword">self</span>.registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">self</span>.equal_flag = register1 == register2;</span><br><span class="line">    <span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>==</code> works fine for comparing integers, since they can be
+expressed exactly in binary. However, two floats may vary by a very
+small amount. For example, say we have <code>1.1003</code> and
+<code>1.1004</code>. We may not care that one is one 10000th higher, and
+care only that they are equal within one tenth. This margin of error is
+often called is epsilon. Rust makes it available via
+<code>use std::f64::EPSILON;</code>.</p>
+<p>Check out our <code>EQ64</code> instruction:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Opcode::EQF64 =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register1</span> = <span class="keyword">self</span>.float_registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">register2</span> = <span class="keyword">self</span>.float_registers[<span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>];</span><br><span class="line">    <span class="keyword">self</span>.equal_flag = (register1 - register2).<span class="title function_ invoke__">abs</span>() &lt; EPSILON;</span><br><span class="line">    <span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>We check if the difference between the two falls within epsilon, and
+if so, consider it equal. All of the 64-bit comparison instructions have
+to utilize epsilon. Give them a shot, and check out the source code if
+you are having trouble.</p>
+<h2 id="assembler">Assembler</h2>
+<p>The last thing we need to update is our assembler to teach it to
+recognize floats. In <code>src/operand_parsers.rs</code>, add this:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">named!(float_operand&lt;CompleteStr, Token&gt;,</span><br><span class="line">    ws!(</span><br><span class="line">        do_parse!(</span><br><span class="line">            sign: opt!(tag!(<span class="string">&quot;-&quot;</span>)) &gt;&gt;</span><br><span class="line">            left_nums: digit &gt;&gt;</span><br><span class="line">            tag!(<span class="string">&quot;.&quot;</span>) &gt;&gt;</span><br><span class="line">            right_nums: digit &gt;&gt;</span><br><span class="line">            (</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">tmp</span> = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">                    <span class="keyword">if</span> sign.<span class="title function_ invoke__">is_some</span>() &#123;</span><br><span class="line">                        tmp.<span class="title function_ invoke__">push_str</span>(<span class="string">&quot;-&quot;</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                    tmp.<span class="title function_ invoke__">push_str</span>(&amp;left_nums.<span class="title function_ invoke__">to_string</span>());</span><br><span class="line">                    tmp.<span class="title function_ invoke__">push_str</span>(<span class="string">&quot;.&quot;</span>);</span><br><span class="line">                    tmp.<span class="title function_ invoke__">push_str</span>(&amp;right_nums.<span class="title function_ invoke__">to_string</span>());</span><br><span class="line">                    <span class="keyword">let</span> <span class="variable">converted</span> = tmp.parse::&lt;<span class="type">f64</span>&gt;().<span class="title function_ invoke__">unwrap</span>();</span><br><span class="line">                    Token::Factor&#123; value: <span class="type">Box</span>::<span class="title function_ invoke__">new</span>(Token::Float&#123;value: converted&#125;) &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>This parser looks for:</p>
+<ol type="1">
+<li><code>#</code></li>
+<li>An optional <code>-</code></li>
+<li>One or more digits</li>
+<li>An <code>.</code></li>
+<li>One or more digits</li>
+</ol>
+<p>This let’s us parse positive and negative floats, as long as there is
+a .. After that, we add the new float parser to the operand parser in
+the same file:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">named!(<span class="keyword">pub</span> operand&lt;CompleteStr, Token&gt;,</span><br><span class="line">    alt!(</span><br><span class="line">        integer_operand |</span><br><span class="line">        float_operand |</span><br><span class="line">        label_usage |</span><br><span class="line">        register |</span><br><span class="line">        irstring</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h2 id="tests">Tests</h2>
+<p>Let’s try a more succinct way of writing a test:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_parse_float_operand</span>() &#123;</span><br><span class="line">    <span class="built_in">vec!</span>[<span class="string">&quot;#100.3&quot;</span>, <span class="string">&quot;#-100.3&quot;</span>, <span class="string">&quot;#1.0&quot;</span>, <span class="string">&quot;#0.0&quot;</span>].<span class="title function_ invoke__">iter</span>().<span class="title function_ invoke__">map</span>(|i| &#123;</span><br><span class="line">        <span class="built_in">assert_eq!</span>(<span class="title function_ invoke__">float_operand</span>(<span class="title function_ invoke__">CompleteStr</span>(i)).<span class="title function_ invoke__">is_ok</span>(), <span class="literal">true</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Still reasonably clear but more compact. The same pattern can be
+applied to other tests as well. I’ll refactor some, but am not going to
+go over them in our tutorial here. Because we have a problem. A big (or
+not so big) problem, depending on how you look at it.</p>
+<h2 id="section">&gt; 2^16</h2>
+<p>With our current design of fixed-width 32-bit instructions, we lose 8
+bits to the opcode. In the case of <code>LOAD</code>, we lose another 8
+to specify the register. This leaves us only 16 bits to express a number
+to load into that register. So even though we have i32 and f64
+registers, we can’t make full use of them. What we need is a way to let
+the programmer input numbers larger than 2^16.</p>
+<p>There’s actually a lot of ways to do this. A common one is to combine
+bit-shifting instructions with loads.</p>
+<h3 id="bit-shifting">Bit Shifting</h3>
+<p>Let’s say we want to load a 32-bit number into a 32-bit register.
+What we could do is have an instruction that sets the first half of the
+target register to the first 16-bits of the register, then an
+instruction that shifted those to the right 16 places.</p>
+<p>So we go from: [0,1,0,0,0,1,1,0,0,0,0,1,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] → [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,1,0,0,0,1,1,0,0,0,0,1,0,0,0,0]. Now we can use the same instruction to
+set the first 16 bits again.</p>
+<h3 id="a-variant-on-bit-shifting">A Variant on Bit Shifting</h3>
+<p>We don’t even need to shift the bits if we have an instruction to set
+both the first 16 and the last 16. When the assembler sees that the user
+wants to load a number &gt; 16 bits, it could automatically output the
+two instructions necessary to set the register halves. You will often
+see this instruction referred to as something like LU, Load Upper,
+LOADU, etc. These instructions are often polite and will shift the upper
+bits down to the lower bits before loading them.</p>
+<p>We’ll work on implementing these in our next tutorial.</p>
+<h2 id="a-quick-shift">A Quick Shift</h2>
+<p>Before we end this tutorial, let’s write a quick bit-shift
+instruction. The new instructions are:</p>
+<ol type="1">
+<li>SHR - Shifts 16 bits to the right</li>
+<li>SHL - Shifts 16 bits to the left</li>
+</ol>
+<p>I’m not going to go through the details of adding in opcodes, other
+than the implementation in <code>src/vm.rs</code>. You should know those
+already. =)</p>
+<p>The syntax for these commands will be:
+<code>* SHR $&lt;reg_num&gt; * SHR $&lt;reg_num&gt; #&lt;number of bits&gt;</code></p>
+<p>The second form is more aspirational, but it would be nice to allow
+users to choose the number of bits to shift if desired.</p>
+<h3 id="shl-implementation">SHL Implementation</h3>
+<p>Below is the implementation for the <code>SHL</code> instruction. The
+remaining one you can implement, or refer to the source code, as it is
+nearly identical.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Opcode::SHL =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">reg_num</span> = <span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() <span class="keyword">as</span> <span class="type">usize</span>;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">num_bits</span> = <span class="keyword">match</span> <span class="keyword">self</span>.<span class="title function_ invoke__">next_8_bits</span>() &#123;</span><br><span class="line">        <span class="number">0</span> =&gt; &#123; <span class="number">16</span> &#125;,</span><br><span class="line">        other =&gt; &#123; other &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">self</span>.registers[reg_num] = <span class="keyword">self</span>.registers[reg_num].<span class="title function_ invoke__">wrapping_shl</span>(num_bits.<span class="title function_ invoke__">into</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This code:</p>
+<ol type="1">
+<li>Gets the register the user wants to shift</li>
+<li>Gets the next 8 bits, which is how many bits they want to shift</li>
+<li>If it is 0, it defaults to 16 bits</li>
+<li>If it is some other number, it shifts that amount</li>
+</ol>
+<p><code>wrapping_shl</code> is a function built-in to the integral
+types (u64, i32, etc).</p>
+<h3 id="and-a-test">And a Test…​</h3>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[test]</span></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">test_shl_opcode</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">test_vm</span> = VM::<span class="title function_ invoke__">get_test_vm</span>();</span><br><span class="line">    test_vm.program = <span class="built_in">vec!</span>[<span class="number">33</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];</span><br><span class="line">    <span class="built_in">assert_eq!</span>(<span class="number">5</span>, test_vm.registers[<span class="number">0</span>]);</span><br><span class="line">    test_vm.<span class="title function_ invoke__">run_once</span>();</span><br><span class="line">    <span class="built_in">assert_eq!</span>(<span class="number">327680</span>, test_vm.registers[<span class="number">0</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>If we print out binary representations of the zeroth register, we can
+see the change:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bits: 0b000000000000000000000000000101</span><br><span class="line">bits: 0b000000000001010000000000000000</span><br></pre></td></tr></table></figure>
+<p>The first line is the number <code>5</code> in binary. If we shift
+left 16 bits, the number becomes <code>32768</code>. Cool, huh?</p>
+<blockquote>
+<p>Did you know that with integers, you can multiply by 2 by shifting an
+integer 1 bit to the left? And you can divide it by two by shifting it
+one bit the other way.</p>
+</blockquote>
+<h2 id="a-final-note-on-floats">A Final Note on Floats</h2>
+<p>You may be wondering why there aren’t bit shift instructions for
+floats. This is because of how floats are represented internally. The
+bits are divided into two parts, the significand and the exponent. If
+you shift bits around, you risk changing the actual meaning of the bits
+by moving them to different sections.</p>
+<h2 id="end">End</h2>
+<p>Yay, we made it! Next up, we’ll make some instructions to load the
+upper or lower halves of a register.</p>
+<p>refer to <a
+target="_blank" rel="noopener" href="https://blog.subnetzero.io/post/building-language-vm-part-26/">building-language-vm</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io">Animenzzzzzz</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://animenzzzzzz.github.io/pages/build-your-own-vm/26/">https://animenzzzzzz.github.io/pages/build-your-own-vm/26/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://animenzzzzzz.github.io" target="_blank">My Dearest</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/virtual-machine/">virtual-machine</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/pages/build-your-own-vm/25/" title="Extending Palladium - Part 1"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Extending Palladium - Part 1</div></div></a><a class="next-post pull-right" href="/pages/build-your-own-vm/27/" title="Clustering - Part 1"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Clustering - Part 1</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/pages/build-your-own-vm/00/" title="Computer Hardware Crash Course"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-19</div><div class="title">Computer Hardware Crash Course</div></div></a><a href="/pages/build-your-own-vm/01/" title="Overview and a Simple VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Overview and a Simple VM</div></div></a><a href="/pages/build-your-own-vm/03/" title="More Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">More Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/02/" title="Basic Opcodes"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="title">Basic Opcodes</div></div></a><a href="/pages/build-your-own-vm/04/" title="Jumps"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Jumps</div></div></a><a href="/pages/build-your-own-vm/05/" title="Equality Checks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-24</div><div class="title">Equality Checks</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Animenzzzzzz</div><div class="author-info-description">向来如此，便对么？</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">64</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Animenzzzzzz"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Animenzzzzzz" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:jinnianqianyin@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">嘿咻~嘿咻~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#intro"><span class="toc-number">1.</span> <span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#integers"><span class="toc-number">2.</span> <span class="toc-text">Integers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#floating-points"><span class="toc-number">3.</span> <span class="toc-text">Floating Points</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cpu-representation"><span class="toc-number">4.</span> <span class="toc-text">CPU Representation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#registers"><span class="toc-number">5.</span> <span class="toc-text">Registers</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#option-1"><span class="toc-number">5.1.</span> <span class="toc-text">Option 1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#option-2"><span class="toc-number">5.2.</span> <span class="toc-text">Option 2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#option-3"><span class="toc-number">5.3.</span> <span class="toc-text">Option 3</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#and-the-winner-is"><span class="toc-number">5.4.</span> <span class="toc-text">And the Winner is…​</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#implementation"><span class="toc-number">6.</span> <span class="toc-text">Implementation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#add-f64-registers-to-vm"><span class="toc-number">6.1.</span> <span class="toc-text">Add f64 Registers to VM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#new-instructions"><span class="toc-number">6.2.</span> <span class="toc-text">New Instructions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#the-one-gotcha"><span class="toc-number">6.3.</span> <span class="toc-text">The One Gotcha</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#assembler"><span class="toc-number">7.</span> <span class="toc-text">Assembler</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tests"><span class="toc-number">8.</span> <span class="toc-text">Tests</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#section"><span class="toc-number">9.</span> <span class="toc-text">&gt; 2^16</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bit-shifting"><span class="toc-number">9.1.</span> <span class="toc-text">Bit Shifting</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#a-variant-on-bit-shifting"><span class="toc-number">9.2.</span> <span class="toc-text">A Variant on Bit Shifting</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#a-quick-shift"><span class="toc-number">10.</span> <span class="toc-text">A Quick Shift</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#shl-implementation"><span class="toc-number">10.1.</span> <span class="toc-text">SHL Implementation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#and-a-test"><span class="toc-number">10.2.</span> <span class="toc-text">And a Test…​</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#a-final-note-on-floats"><span class="toc-number">11.</span> <span class="toc-text">A Final Note on Floats</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#end"><span class="toc-number">12.</span> <span class="toc-text">End</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By Animenzzzzzz</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({svg}) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
