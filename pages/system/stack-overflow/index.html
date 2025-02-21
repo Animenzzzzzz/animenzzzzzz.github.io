@@ -7,7 +7,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://animenzzzzzz.github.io/img/avatar.jpg">
 <meta property="article:published_time" content="2025-02-20T06:49:15.000Z">
-<meta property="article:modified_time" content="2025-02-20T09:09:49.544Z">
+<meta property="article:modified_time" content="2025-02-21T02:27:51.972Z">
 <meta property="article:author" content="Animenzzzzzz">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://animenzzzzzz.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://animenzzzzzz.github.io/pages/system/stack-overflow/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>(()=>{
@@ -173,15 +173,15 @@
   isHome: false,
   isHighlightShrink: false,
   isToc: true,
-  postUpdate: '2025-02-20 17:09:49'
-}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">70</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">栈溢出</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-02-20T06:49:15.000Z" title="发表于 2025-02-20 14:49:15">2025-02-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-02-20T09:09:49.544Z" title="更新于 2025-02-20 17:09:49">2025-02-20</time></span></div><div class="meta-secondline"></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="简介">简介</h1>
+  postUpdate: '2025-02-21 10:27:51'
+}</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">70</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_img.jpg);"><nav id="nav"><span id="blog-info"><a href="/" title="My Dearest"><span class="site-name">My Dearest</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">栈溢出</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-02-20T06:49:15.000Z" title="发表于 2025-02-20 14:49:15">2025-02-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-02-21T02:27:51.972Z" title="更新于 2025-02-21 10:27:51">2025-02-21</time></span></div><div class="meta-secondline"></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="简介">简介</h1>
 <p>当函数正在执行内部指令的过程中我们无法拿到程序的控制权，只有在发生函数调用或者结束函数调用时，程序的控制权会在函数状态之间发生跳转，这时才可以通过修改函数状态来实现攻击。而控制程序执行指令最关键的寄存器就是
 eip（还记得 eip 的用途吗？），所以我们的目标就是让 eip
 载入攻击指令的地址。</p>
 <p>先来看看函数调用结束时，如果要让 eip
 指向攻击指令，需要哪些准备？首先，在退栈过程中，返回地址会被传给
 eip，所以我们只需要让溢出数据用攻击指令的地址来覆盖返回地址就可以了。其次，我们可以在溢出数据内包含一段攻击指令，也可以在内存其他位置寻找可用的攻击指令。</p>
-<p><img src="/img/system/stack-overflow-01.png" width="80%" loading="lazy" /></p>
+<p><img src="/img/system/stack-overflow-01.png" width="85%" loading="lazy" /></p>
 <blockquote>
 <p>核心目的是用攻击指令的地址来覆盖返回地址</p>
 </blockquote>
@@ -201,14 +201,15 @@ GOT</strong>）</li>
 <p>修改返回地址，让其指向溢出数据中的一段指令</p>
 </blockquote>
 <p>根据上面副标题的说明，要完成的任务包括：在溢出数据内包含一段攻击指令，用攻击指令的起始地址覆盖掉返回地址。攻击指令一般都是用来打开
-shell，从而可以获得当前进程的控制权，所以这类指令片段也被成为“shellcode”。shellcode
+shell，从而可以获得当前进程的控制权，所以这类指令片段也被成为 shellcode
+。shellcode
 可以用汇编语言来写再转成对应的机器码，也可以上网搜索直接复制粘贴，这里就不再赘述。下面我们先写出溢出数据的组成，再确定对应的各部分填充进去。</p>
 <blockquote>
 <p><strong>payload</strong> : padding1 + address of shellcode + padding2
 + shellcode</p>
 </blockquote>
 <figure>
-<img src="/img/system/stack-overflow-shellcode-01.png" width="80%" loading="lazy" />
+<img src="/img/system/stack-overflow-shellcode-01.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 shellcode 所用溢出数据的构造
 </figcaption>
@@ -246,7 +247,7 @@ shellcode 的起始地址。</p>
 <p>解决完上述问题，我们就可以拼接出最终的溢出数据，输入至程序来执行
 shellcode 了。</p>
 <figure>
-<img src="/img/system/stack-overflow-shellcode-02.png" width="80%" loading="lazy" />
+<img src="/img/system/stack-overflow-shellcode-02.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 shellcode 所用溢出数据的最终构造
 </figcaption>
@@ -270,10 +271,10 @@ system() 函数打开 shell 的完整形式为 <code>system("/bin/sh")</code>
 为例，先写出溢出数据的组成，再确定对应的各部分填充进去。</p>
 <blockquote>
 <p><strong>payload</strong>: padding1 + address of system() + padding2 +
-address of <code>/bin/sh</code></p>
+address of /bin/sh</p>
 </blockquote>
 <figure>
-<img src="/img/system/stack-overflow-return2libc-01.png" width="80%" loading="lazy" />
+<img src="/img/system/stack-overflow-return2libc-01.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 return2libc 所用溢出数据的构造
 </figcaption>
@@ -283,9 +284,9 @@ return2libc 所用溢出数据的构造
 of system() 是 system() 在内存中的地址，用来覆盖返回地址。padding2
 处的数据长度为4（32位机），对应调用 system()
 时的返回地址。因为我们在这里只需要打开 shell 就可以，并不关心从 shell
-退出之后的行为，所以 padding2 的内容可以随意填充。address of
-<code>/bin/sh</code> 是字符串
-<code>/bin/sh</code>在内存中的地址，作为传给 system() 的参数。</p>
+退出之后的行为，所以 padding2 的内容可以随意填充。<strong>address of
+/bin/sh</strong> 是字符串 <code>/bin/sh</code> 在内存中的地址，作为传给
+system() 的参数。</p>
 <p>根据上面的构造，我们要解决个问题。</p>
 <ol type="1">
 <li>返回地址之前的填充数据（padding1）应该多长？</li>
@@ -331,7 +332,7 @@ Segment）。代码段存储可执行代码和只读常量（如常量字符串�
 malloc() 和 free()
 函数就是在堆上分配和释放内存。各段在内存的排列如下图所示。</p>
 <figure>
-<img src="/img/system/stack-overflow-register-01.png" width="50%" loading="lazy" />
+<img src="/img/system/stack-overflow-register-01.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 内存分段的典型布局
 </figcaption>
@@ -383,7 +384,7 @@ return2libc
 <p><strong>payload</strong> : padding + address of gadget</p>
 </blockquote>
 <figure>
-<img src="/img/system/stack-overflow-ROP-01.png" width="80%" loading="lazy" />
+<img src="/img/system/stack-overflow-ROP-01.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 包含单个 gadget 的溢出
 </figcaption>
@@ -401,7 +402,7 @@ gadget 2 + ...... + address of gadget n</p>
 gadget 1 的 RET 指令会将此时的栈顶数据（也就是 gadget 2 的地址）弹出至
 eip，程序继续跳转执行 gadget 2，以此类推。</p>
 <figure>
-<img src="/img/system/stack-overflow-ROP-02.png" width="80%" loading="lazy" />
+<img src="/img/system/stack-overflow-ROP-02.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 包含多个 gadget 的溢出
 </figcaption>
@@ -416,7 +417,7 @@ ebx，ecx，edx，esi，edi 中。例如，编号125对应函数
 ，可用该函数将栈的属性改为可执行，这样就可以使用 shellcode
 了。假如我们想利用系统调用执行这个函数，eax、ebx、ecx、edx 应该分别为
 <strong>125</strong>、内存栈的分段地址（可以通过调试工具确定）、<code>0x10000</code>（需要修改的空间长度，也许需要更长）、<strong>7</strong>（RWX
-权限）。</p>
+权限：r = 4，w = 2，x = 1）。</p>
 <p>其次，如何寻找对应的指令片段？</p>
 <p>有若干开源工具可以实现搜索以 ret 结尾的指令片段，著名的包括
 ROPgadget、rp++、ropeme 等，甚至也可以用 grep
@@ -430,7 +431,7 @@ mov 指令来进行传输，不过写入数据再 pop 要比先搜索再 mov
 指令来传输调用参数，就需要在溢出数据内包含这些参数，所以上面的溢出数据格式需要一点修改。对于单个
 gadget，pop 所传输的数据应该在 gadget 地址之后，如下图所示。</p>
 <figure>
-<img src="/img/system/stack-overflow-ROP-03.png" width="80%" loading="lazy" />
+<img src="/img/system/stack-overflow-ROP-03.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 gadget <code>pop eax; ret;</code>
 </figcaption>
@@ -441,7 +442,7 @@ shellcode，所以要将 shellcode 也加入溢出数据，并将 shellcode
 在内存的确切地址是很困难的事，我们可以使用 <code>push esp</code> 这个
 gadget（假如可以找到的话）。</p>
 <figure>
-<img src="/img/system/stack-overflow-ROP-04.png" width="80%" loading="lazy" />
+<img src="/img/system/stack-overflow-ROP-04.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 gadget <code>push esp; ret;</code>
 </figcaption>
@@ -457,7 +458,7 @@ gadget 1 + address of gadget 2 + param for gadget 2 + ...... + address
 of gadget n + shellcode</p>
 </blockquote>
 <figure>
-<img src="/img/system/stack-overflow-ROP-05.png" width="80%" loading="lazy" />
+<img src="/img/system/stack-overflow-ROP-05.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 包含多个 gadget 的溢出数据（修改后）
 </figcaption>
@@ -467,7 +468,7 @@ payload 可以直接包含 <code>\x7d\x00\x00\x00</code>（传给 eax
 的参数125）。如果希望实现更为真实的操作，可以用多个 gadget
 通过运算得到上述参数。比如可以通过下面三条 gadget 来给 eax
 传递参数。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pop eax; ret;         # pop stack top 0x1111118e into eax</span><br><span class="line">pop ebx; ret;         # pop stack top 0x11111111 into ebx</span><br><span class="line">sub eax, ebx; ret;    # eax -= ebx</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pop eax; ret;         # pop stack top 0x1111118e into eax</span><br><span class="line">pop ebx; ret;         # pop stack top 0x11111111 into ebx</span><br><span class="line">sub eax, ebx; ret;    # eax -= ebx</span><br></pre></td></tr></table></figure>
 <p>解决完上述问题，我们就可以拼接出溢出数据，输入至程序来为程序调用栈开启可执行权限并执行
 shellcode。同时，由于 ROP 方法带来的灵活性，现在不再需要痛苦地试探
 shellcode
@@ -508,7 +509,7 @@ Segment）内，在运行之前就已经确定并且不会被修改，所以 PLT
 并不会知道程序运行时动态链接库被加载的确切位置。那么 PLT
 表内存储的入口点是什么呢？就是 GOT 表中对应条目的地址。</p>
 <figure>
-<img src="/img/system/stack-overflow-hijack-GOT-01.png" width="70%" loading="lazy" />
+<img src="/img/system/stack-overflow-hijack-GOT-01.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 PLT 和 GOT 表
 </figcaption>
@@ -527,13 +528,13 @@ PLT 表内寻找对应的入口点，跳转到 GOT
 PLT 表跳转到 GOT 表，此时 GOT
 表已经存有获取函数的内存地址，所以会直接跳转到函数所在地址执行函数。整个过程如下面两张图所示。</p>
 <figure>
-<img src="/img/system/stack-overflow-hijack-GOT-02.png" width="70%" loading="lazy" />
+<img src="/img/system/stack-overflow-hijack-GOT-02.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 第一次调用函数时解析函数地址并存入 GOT 表
 </figcaption>
 </figure>
 <figure>
-<img src="/img/system/stack-overflow-hijack-GOT-03.png" width="70%" loading="lazy" />
+<img src="/img/system/stack-overflow-hijack-GOT-03.png" width="85%" loading="lazy" />
 <figcaption style="text-align: center;">
 再次调用函数时直接读取 GOT 内的地址
 </figcaption>
@@ -550,7 +551,8 @@ GOT 表中的条目。</p>
 表的对应条目，所以可以在函数调用的汇编指令中找到 PLT
 表中该函数的入口点位置，从而定位到该函数在 GOT 中的条目。</p>
 <p>例如：<code>call 0x08048430 &lt;printf@plt&gt;</code></p>
-<p>就说明 printf 在 PLT 表中的入口点是在 0x08048430，所以 0x08048430
+<p>就说明 printf 在 PLT 表中的入口点是在
+<strong>0x08048430</strong>，所以 <strong>0x08048430</strong>
 处存储的就是 GOT 表中 printf 的条目地址。</p>
 <p>其次，如何确定函数 B 在内存中的地址？</p>
 <p>如果系统开启了内存布局随机化，程序每次运行动态链接库的加载位置都是随机的，就很难通过调试工具直接确定函数的地址。假如函数
@@ -564,7 +566,7 @@ A 的运行时地址（读取 GOT 表内容），也知道函数 A 和函数 B
 <p>很难找到合适的函数来完成这一任务，不过我们还有强大的
 ROP（DIY大法好）。假设我们可以找到以下若干条
 gadget（继续钦点），就不难改写 GOT 表中数据，从而实现函数的伪装。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pop eax; ret; 		# printf@plt -&gt; eax</span><br><span class="line">mov ebx [eax]; ret;	# printf@got -&gt; ebx</span><br><span class="line">pop ecx; ret; 		# addr_diff = system - printf -&gt; ecx</span><br><span class="line">add [ebx] ecx; ret; # printf@got += addr_diff</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pop eax; ret; 		  # printf@plt -&gt; eax</span><br><span class="line">mov ebx [eax]; ret;	# printf@got -&gt; ebx</span><br><span class="line">pop ecx; ret; 		  # addr_diff = system - printf -&gt; ecx</span><br><span class="line">add [ebx] ecx; ret; # printf@got += addr_diff</span><br></pre></td></tr></table></figure>
 <p>从修改 GOT
 表的过程可以看出，这种方法也可以在一定程度上绕过内存随机化。</p>
 <h1 id="防御">防御</h1>
